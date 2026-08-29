@@ -1,0 +1,28 @@
+# IDE and editor
+.vscode/
+.vs/
+.idea/
+*.suo
+*.user
+*.swp
+*.swo
+*~
+
+# OS-generated
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and backups
+*.log
+*.bak
+*.ps1.bak
+*.psd1.bak
+backups/
+
+# Development-only artefacts
+*.preview*
+*.min*
+helpers/
+image-scripts/
+archive/
