@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Feature ideas
-    url: mailto:feedback@tidylog.dev
-    about: TidyLog is a curated project. Feature suggestions are welcomed by email rather than as issues. Please write to ideas@tidylog.dev.
+    url: https://tidylog.dev/feedback
+    about: TidyLog is a curated project. Feature suggestions welcomed by email (feedback@tidylog.dev) rather than issues.
