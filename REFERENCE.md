@@ -2,6 +2,7 @@
 
 - [How to use TidyLog](#how-to-use-tidylog)
   - [Header & Footer](#header--footer)
+  - [Tracking Events](#tracking-events)
   - [Build Phases](#build-phases)
   - [Animate Progress](#animate-progress)
   - [Wait Functions](#wait-functions)
