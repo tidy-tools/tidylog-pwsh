@@ -28,7 +28,14 @@ param(
     [string]$Phase
 )
 
-. "$PSScriptRoot\..\TidyLog.ps1"
+$tidyLogPath = if (Test-Path "$PSScriptRoot\TidyLog.ps1") {
+    "$PSScriptRoot\TidyLog.ps1"
+} elseif (Test-Path "$PSScriptRoot\..\TidyLog.ps1") {
+    "$PSScriptRoot\..\TidyLog.ps1"
+} else {
+    throw "TidyLog.ps1 not found."
+}
+. $tidyLogPath
 
 function ShouldRun { param([string]$Tag) return (-not $Phase -or $Phase -ieq $Tag) }
 

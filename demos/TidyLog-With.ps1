@@ -8,7 +8,14 @@ param(
 	[switch]$ClearScreen
 )
 
-. "$PSScriptRoot\..\TidyLog.ps1"
+$tidyLogPath = if (Test-Path "$PSScriptRoot\TidyLog.ps1") {
+    "$PSScriptRoot\TidyLog.ps1"
+} elseif (Test-Path "$PSScriptRoot\..\TidyLog.ps1") {
+    "$PSScriptRoot\..\TidyLog.ps1"
+} else {
+    throw "TidyLog.ps1 not found."
+}
+. $tidyLogPath
 
 if ($ClearScreen) { Clear-Host }
 
