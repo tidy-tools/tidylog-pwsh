@@ -50,7 +50,7 @@ Install-Module TidyLog-pwsh
 ```
 
 To create an example file that uses dot-source TidyLog:  
-1) Download [TidyLog Demo Pack](#https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder.
+1) Download [TidyLog Demo Pack](https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder.
 2) In the new folder, create a new .ps1 file and paste in this code:
 ```powershell
 . "$PSScriptRoot\TidyLog.ps1"
@@ -74,7 +74,7 @@ Write-TLFooter -Message "Install complete"
 
 These demos are runnable examples showing how to use the TidyLog library.  
 
-To run the demo, download [TidyLog Demo Pack](#https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder. `cd` to the new folder and run the commands below.
+To run the demo, download [TidyLog Demo Pack](https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder. `cd` to the new folder and run the commands below.
 
 *> Windows can block downloaded scripts by default, so optionally prefix the file name with 
 `powershell -ep Bypass -f`.*
