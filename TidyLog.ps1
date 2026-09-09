@@ -1,10 +1,12 @@
 ﻿# =============================================================================
 # TidyLog.ps1 : Spacious console output for PowerShell
 # https://github.com/tidy-tools/tidylog-pwsh
-# API reference: https://tidylog/reference/
+# API reference: https://tidylog.dev/reference/
 # MIT License  : Copyright 2026 Nathan Kitchen
 # Version: 0.9.0
 # =============================================================================
+
+#Requires -version 5.1
 
 # $TL is script-level state shared across all TidyLog functions.
 # Functions read/modify properties only, never reassign $TL itself.
@@ -34,7 +36,7 @@ $TL = @{
 .SYNOPSIS
 	Sets the layout widths and default column used by all output functions. Calling it with no parameters resets every value back to the library default.
 .PARAMETER Margin
-	Left margin, in characters, applied before all output. Default: 2. Valid range 2–16.
+	Left margin, in characters, applied before all output. Default: 2. Valid range 2 - 16.
 .PARAMETER Column1Width
 	Character width of the first column.
 	Default: 14. Valid range 8 - 30.
@@ -135,11 +137,11 @@ function Set-TLGlyphSet {
 	Accepted values: Success, Warning, Error, Exception
 #>
 function Get-TLEventSummary {
-    [OutputType([PSCustomObject[]])]
-    param(
-        [ValidateSet("Success", "Warning", "Error", "Exception")]
-        [string[]]$EventType
-    )
+	[OutputType([PSCustomObject[]])]
+	param(
+		[ValidateSet("Success", "Warning", "Error", "Exception")]
+		[string[]]$EventType
+	)
 
 	$typeToIcon = @{
 		Success   = "Ok"
@@ -148,10 +150,10 @@ function Get-TLEventSummary {
 		Exception = "Exception"
 	}
 
-    $entries = if ($EventType) {
+	$entries = if ($EventType) {
 		$iconType = $EventType | ForEach-Object { $typeToIcon[$_] }
-        @($TL.Summary | Where-Object { $_.Icon -in $iconType })
-    } else {
+		@($TL.Summary | Where-Object { $_.Icon -in $iconType })
+	} else {
 		$TL.Summary
 	}
 
@@ -164,20 +166,20 @@ function Get-TLEventSummary {
 
 	# repackage $TL.Summary into single Message and EventType objects
 	foreach ($entry in $entries) {
-        $message = if ([string]::IsNullOrEmpty($entry.Detail)) {
-            $entry.Label
-        } else {
+		$message = if ([string]::IsNullOrEmpty($entry.Detail)) {
+			$entry.Label
+		} else {
 			$colon = if (-not $entry.Label.TrimEnd().EndsWith(":")) { ":" }
-            "$($entry.Label)$colon $($entry.Detail)"
-        }
+			"$($entry.Label)$colon $($entry.Detail)"
+		}
 
 		$type = $iconToType[$entry.Icon]
 
-        [PSCustomObject]@{
-            Message   = $message
-            EventType = $type
-        }
-    }
+		[PSCustomObject]@{
+			Message   = $message
+			EventType = $type
+		}
+	}
 }
 
 
@@ -218,13 +220,13 @@ function Get-TLElapsed {
 
 <#
 .SYNOPSIS
-	Prints an header banner with -Title and -Summary.
+	Prints a header banner with -Title and -Summary.
 .DESCRIPTION
 	Self-sizing banner, right-aligned summary. Banner width is calculated automatically from header content with minimum 60 chars, maximum 100. Starts a timer if one is not already running.
 .PARAMETER Title
 	Left aligned title. Will default to the caller file name minus extension.
 .PARAMETER Summary
-	Right aligned summary. Each entry split by ·/. (Unicode/ASCII). Max 4 entries.
+	Right aligned summary of up to 4 words/phrases. Each entry split by ·/. (Unicode/ASCII).
 .PARAMETER SummaryColor
 	Sets the color of the right aligned summary. Must be a valid System.ConsoleColor.
 #>
@@ -323,11 +325,8 @@ function Write-TLFooter {
 		$longestLabelLen = 0; $longestDetailLen = 0
 
 		foreach ($entry in $entries) {
-			$labelDisplayLen  = $entry.Label.Length
-			$detailDisplayLen = $entry.Detail.Length
-
-			$longestLabelLen  = [Math]::Max($labelDisplayLen, $longestLabelLen)
-			$longestDetailLen = [Math]::Max($detailDisplayLen, $longestDetailLen)
+			$longestLabelLen  = [Math]::Max($entry.Label.Length, $longestLabelLen)
+			$longestDetailLen = [Math]::Max($entry.Detail.Length, $longestDetailLen)
 		}
 
 		# if needed, adjust $tableWidth to fit content
@@ -415,7 +414,7 @@ function Write-TLFooter {
 .PARAMETER Tag
 	Phase title that's left aligned to Margin (see Get-TLLayout).
 .PARAMETER Description
-	Text to the right of the -Tag. If left blank will be populated with ··/.. (Unicode/ASCII).
+	Text to the right of the -Tag. If not explicitly set it will be populated with ··/.. (Unicode/ASCII).
 .PARAMETER Color
 	Sets the -Tag font color. Must be a valid System.ConsoleColor.
 	Default inherits $TL.PhaseDefaultColor.
@@ -446,9 +445,9 @@ function Write-TLPhase {
 
 	if ($ShowElapsed -and $null -ne $TL.StartTime) {
 		# show the elapsed time on the right side
-		$windowWidth	= $Host.UI.RawUI.WindowSize.Width - 10
-		$line	 		= $tag + $description
-		$elapsedPad		= " " * [Math]::Max(1, $windowWidth - $line.Length)
+		$windowWidth = if ($Host.UI.RawUI.WindowSize) { $Host.UI.RawUI.WindowSize.Width - 10 } else { 80 }
+		$line	 	 = $tag + $description
+		$elapsedPad  = " " * [Math]::Max(1, $windowWidth - $line.Length)
 
 		Write-Host $description -ForegroundColor Gray -NoNewline
 		Write-Host ($elapsedPad + (Get-TLElapsed)) -ForegroundColor DarkGray
@@ -569,7 +568,8 @@ function Write-TLListItem {
 .SYNOPSIS
 	Closes the list. Accepts optional confirmation -Message and -Icon.
 .PARAMETER Message
-	Text for the closing message. Defaults to done.
+	Text for the closing message.
+	Default: done.
 .PARAMETER Icon
 	Colors the -Message text and appends a glyph.
 	Accepted values Ok, Warn, Error, None.
@@ -632,7 +632,7 @@ function Write-TLProgressDotAdd {
 
 <#
 .SYNOPSIS
-	Ends the dot sequence with closing green -Message and optional -Tick.
+	Ends the dot sequence with closing green -Message and optional -Icon.
 .PARAMETER Message
 	Closing message. Default: done.
 .PARAMETER Icon
@@ -647,7 +647,6 @@ function Write-TLProgressDotEnd {
 		[ValidateSet("Ok","Warn","Error","None")]
 		[string]$Icon = "None"
 	)
-
 	Write-TLListEnd -Message " $Message" -Icon $Icon
 }
 
@@ -661,10 +660,10 @@ function Write-TLProgressDotEnd {
 .SYNOPSIS
 	Fixed-duration wait.
 .DESCRIPTION
-	Under 8 seconds and the dots animate in a single color. Waiting 8 seconds or more, the wait splits into color stages indicated by -Tone so a long wait visibly signals progress against set time.
+	Under 8 seconds and the dots animate in a single color. Waiting 8 seconds or more, the wait splits into color stages indicated by -Tone so that a long wait visibly signals progress against set time.
 .PARAMETER Label
 	Left aligned text.
-.PARAMETER WaitTime
+.PARAMETER Seconds
 	Seconds to wait.
 	Default: 10.
 .PARAMETER CompletionMessage
@@ -677,7 +676,7 @@ function Write-TLProgressDotEnd {
 .PARAMETER Tone
 	Sets the color tone for the dots.
 	Accepted values: Cool, Warm, Neutral
-	Default: Cool.
+	Default: Neutral.
 .PARAMETER ShowInSummary
 	Shows details from this line in the footer summary table.
 #>
@@ -687,7 +686,7 @@ function Wait-TLTimed {
 		[ValidateNotNullOrEmpty()]
 		[string]$Label,
 		[ValidateRange(1, 86400)]	# max timeout 24 hours
-		[int]$WaitTime			  = 10,
+		[int]$Seconds			  = 10,
 		[string]$CompletionMessage  = "",
 		[ValidateRange(1,4)]
 		[int]$Column = $TL.DefaultColumn,
@@ -698,12 +697,12 @@ function Wait-TLTimed {
 
 	# setup the wait, display the dots, then output completion message
 	Invoke-TLWait -Label $Label -Column $Column
-	Invoke-TLDotDisplay -Duration $WaitTime -Tone $Tone
+	Invoke-TLDotDisplay -Duration $Seconds -Tone $Tone
 
 	$iconOK = Get-TLIconInfo "Ok"
 
 	Write-Host (" $CompletionMessage ").TrimEnd() $iconOK.Glyph -ForegroundColor $iconOK.Color
-	if ($ShowInSummary) { Add-TLSummaryLine -Label $Label -Detail $CompletionMessage -Icon $iconOK.Word }
+	if ($ShowInSummary) { Add-TLSummaryLine -Label $Label -Detail $CompletionMessage -Icon $iconOK.Word	}
 }
 
 
@@ -716,9 +715,9 @@ function Wait-TLTimed {
 	Left aligned text.
 .PARAMETER Condition
 	Evaluated after each -WaitInterval. Must return $true/$false.
-.PARAMETER Timeout
-	Timeout ceiling in milliseconds.
-	Default: 15000 (15 seconds).
+.PARAMETER TimeoutSec
+	Timeout ceiling in seconds.
+	Default: 15.
 .PARAMETER CompletionMessage
 	Message shown when -Condition is met.
 	Default: None, shows just the glyph.
@@ -735,7 +734,7 @@ function Wait-TLTimed {
 .PARAMETER Tone
 	Sets the color tone for the dots.
 	Accepted values: Cool, Warm, Neutral
-	Default inherits Cool.
+	Default inherits Neutral.
 .PARAMETER ShowInSummary
 	Shows details from this line in the footer summary table.
 #>
@@ -748,8 +747,8 @@ function Wait-TLConditional {
 		[Parameter(Mandatory)]
 		[ValidateNotNullOrEmpty()]
 		[scriptblock]$Condition,
-		[ValidateRange(1, 86400000)]		# max timeout 24 hours
-		[int]$Timeout               = 15000,
+		[ValidateRange(1, 86400)]		# max timeout 24 hours
+		[int]$TimeoutSec            = 15,
 		[string]$CompletionMessage  = "",
 		[string]$TimeoutMessage   	= "timed out",
 		[ValidateRange(1, 60)]				# max polling interval is 1 min
@@ -764,8 +763,7 @@ function Wait-TLConditional {
 	Invoke-TLWait -Label $Label -Column $Column
 
 	# display dots while waiting for condition to be met
-	$timeoutSeconds = $Timeout / 1000
-	$conditionMet   = Invoke-TLDotDisplay -Duration $timeoutSeconds -WaitInterval $WaitInterval -Condition $Condition -Tone $Tone
+	$conditionMet   = Invoke-TLDotDisplay -Duration $TimeoutSec -WaitInterval $WaitInterval -Condition $Condition -Tone $Tone
 
 	# output the result based on $conditionMet
 	$msg = $CompletionMessage
@@ -777,7 +775,7 @@ function Wait-TLConditional {
 	}
 
 	Write-Host (" $msg ").TrimEnd() $iconInfo.Glyph -ForegroundColor $iconInfo.Color
-	if ($ShowInSummary) {Add-TLSummaryLine -Label $Label -Detail $msg -Icon $iconInfo.Word}
+	if ($ShowInSummary) { Add-TLSummaryLine -Label $Label -Detail $msg -Icon $iconInfo.Word	}
 
 	return $conditionMet
 }
@@ -792,7 +790,7 @@ function Wait-TLConditional {
 .SYNOPSIS
 	In-place counter with n of N or percentage display.
 .DESCRIPTION
-	Automatically detects a new sequence and resets when -Current is below the previous -Current value, or -Total is different from previous -Total. Safe to reuse across multiple loops without manual reset. Once a sequence completes, further calls are a silent no-op until a new sequence is detected. By default will update the output line in place using a rewrite. PowerShell ISE doesn't support in place rewriting, so display falls back to writing each update on its own new line. Validates input: -Total must be greater than 0; -Current must be 0 or greater. Invalid values raise a parameter error and the call is skipped.
+	Safe to reuse across multiple loops without manual reset. Automatically detects a new sequence and resets when -Current is below the previous -Current value, or -Total is different from previous -Total. Once a sequence completes, further calls are a silent no-op until a new sequence is detected. By default it will update the output line in place using a rewrite. PowerShell ISE doesn't support in place rewriting, so display falls back to writing each update on its own new line. Validates input: -Total must be greater than 0; -Current must be 0 or greater. Invalid values raise a parameter error and the call is skipped.
 .PARAMETER Label
 	Left aligned text.
 .PARAMETER Current
@@ -886,7 +884,7 @@ function Write-TLCounter {
 .PARAMETER Label
 	Left aligned text.
 .PARAMETER Percent
-	0–100 value. Accepts [int] or [double] and rounds up to the nearest whole number.
+	0 - 100 value. Accepts [int] or [double] and rounds up to the nearest whole number.
 .PARAMETER Column
 	Column position for -Label.
 	Accepted values: 1, 2, 3, 4
@@ -959,7 +957,7 @@ function Write-TLCounterEnd {
 	Closing message.
 	Default is "" that closes the line cleanly.
 .PARAMETER Icon
-	Colors the -Detail text and appends a glyph.
+	Colors the -Message text and appends a glyph.
 	Accepted values Ok, Warn, Error, None.
 	Default: None.
 .PARAMETER ShowInSummary
@@ -1016,16 +1014,22 @@ function Read-TLInput {
 	$promptText	  = if (-not [string]::IsNullOrEmpty($Default)) { "$Prompt [$Default]" } else { $Prompt }
 	$paddedPrompt = (Get-TLIndentSpacing $Column) + $promptText
 
-	if ($Mode -eq "Secure") { return (Read-Host $paddedPrompt -AsSecureString) }
+	if ($Mode -eq "Secure") {
+		return (Read-Host $paddedPrompt -AsSecureString)
+	}
 
 	if ($Mode -eq "Mask") {
-		if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSVersionTable.PSVersion.Minor -ge 1) {
+		if ($PSVersionTable.PSVersion -ge [Version]"7.1") {
 			return (Read-Host $paddedPrompt -MaskInput)
 		} else {
 			# use secure string to mask input, then return a plain string
 			$secureString = (Read-Host $paddedPrompt -AsSecureString)
 			$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureString)
-			return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+			try {
+				return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+			} finally {
+				[System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+			}
 		}
 	}
 
@@ -1043,13 +1047,13 @@ function Read-TLInput {
 .SYNOPSIS
 	Displays options and captures a user selection. -Options accepts either an array or an ordered hashtable and displays the options inline or stacked.
 .DESCRIPTION
-	Validates input: -Options must be an ordered hashtable or an array. If neither, the function will throw an error. Return value: Returns a valid key entered in the console. See -Options for exact return type. Return value can be used an an index into the passed array or hashtable.
+	Validates input: -Options must be an ordered hashtable or an array. If neither, the function will throw an error. Return value: Returns a PSCustomObject that contains Key, Index and Value. Value always contains the string representation of the selected option. See -Options for Key/Index return values. Returned data can be used as is, or as an index/key back into the passed array or hashtable.
 .PARAMETER Prompt
 	The instruction that sits above the list of options. The default, which can be used in most cases, is "Press the key in [brackets] to select the option:".
 .PARAMETER Options
 	Accepts array or ordered hashtable.
-	Arrays: Using an array means the function will auto-display numbers next to each choice. This option is limited to 9 entries in the array. Returns the [int] value of the selected number.
-	Hashtable: Pass custom keys by using a hashtable. Returns the exact hashtable key that relates to the chosen option.
+	Arrays: Using an array means the function will auto-display numbers next to each choice. This option is limited to 9 entries in the array. Returned PSCustomObject has Index as the [int] value of the selected number.
+	Hashtable: Pass custom keys by using a hashtable. Returned PSCustomObject has Key as the hashtable key for the chosen option.
 .PARAMETER Default
 	The default selection. Allows user to press enter without typing a value.
 .PARAMETER ListMode
@@ -1062,6 +1066,7 @@ function Read-TLInput {
 	Default inherits $TL.DefaultColumn.
 #>
 function Read-TLSelection {
+	[OutputType([PSCustomObject])]
 	param(
 		[ValidateNotNullOrEmpty()]
 		[string]$Prompt = "Press the key in [brackets] to select the option:",
@@ -1075,21 +1080,21 @@ function Read-TLSelection {
 		[int]$Column = $TL.DefaultColumn
 	)
 
-    # determine path from type
-    if ($Options -is [array]) {
-        # cap options at 9
+	# determine path from type
+	if ($Options -is [array]) {
+		# cap options at 9
 		if ($Options.Count -gt 9) {
 			throw "Read-TLSelection: numbered options are limited to 9 items. For larger option sets consider grouping related items into separate prompts."
 		}
 
-        # build numbered display list
-        $displayItems = 0..($Options.Count - 1) | ForEach-Object { "[$($_ + 1)] $($Options[$_])" }
-        $validKeys    = 1..$Options.Count | ForEach-Object { "$_" }
+		# build numbered display list
+		$displayItems = 0..($Options.Count - 1) | ForEach-Object { "[$($_ + 1)] $($Options[$_])" }
+		$validKeys    = 1..$Options.Count | ForEach-Object { "$_" }
 
-    } elseif ($Options -is [System.Collections.IDictionary]) {
-        # build keyed display items
-        $displayItems = $Options.Keys | ForEach-Object { "[$_] $($Options[$_])" }
-        $validKeys    = $Options.Keys | ForEach-Object { $_.ToLower() }
+	} elseif ($Options -is [System.Collections.IDictionary]) {
+		# build keyed display items
+		$displayItems = $Options.Keys | ForEach-Object { "[$_] $($Options[$_])" }
+		$validKeys    = $Options.Keys | ForEach-Object { $_.ToLower() }
 
 	} else {
 		throw "Read-TLSelection: -Options must be an array or ordered hashtable."
@@ -1102,30 +1107,39 @@ function Read-TLSelection {
 		}
 	}
 
-    Write-TLDetail $Prompt -BeginSection
+	Write-TLDetail $Prompt -BeginSection
 
-    # display the options
-    $dot = (Get-TLIconInfo Dot).Glyph
-    if ($ListMode -eq "Inline") {
-        Write-TLDetail ($displayItems -join "  $dot  ")
-    } else {
+	# display the options
+	$dot = (Get-TLIconInfo Dot).Glyph
+	if ($ListMode -eq "Inline") {
+		Write-TLDetail ($displayItems -join "  $dot  ")
+	} else {
 		# stack items on newlines
 		$displayItems | ForEach-Object { Write-TLDetail $_ }
-    }
+	}
 
-    # validation, re-prompt on invalid input
-    while ($true) {
+	# validation, re-prompt on invalid input
+	while ($true) {
 		$promptText = if (-not [string]::IsNullOrEmpty($Default)) { "Press Enter to select" } else { "" }
-        $response   = Read-TLInput -Prompt $promptText -Column $Column -Default $Default
-        if ($response.ToLower() -in $validKeys) {
+		$response   = Read-TLInput -Prompt $promptText -Column $Column -Default $Default
+		if ($response.ToLower() -in $validKeys) {
 			Write-Host ""	# create space below this block
-            if ($Options -is [array]) {
-                return [int]$response
-            } else {
-                return ($Options.Keys | Where-Object { $_.ToLower() -eq $response.ToLower() } | Select-Object -First 1)
-            }
-        }
-    }
+			if ($Options -is [array]) {
+				return [PSCustomObject]@{
+					Key   = [string]$response
+					Index = [int]$response
+					Value = $Options[[int]$response - 1]
+				}
+			} else {
+				$matchedKey = $Options.Keys | Where-Object { $_.ToLower() -eq $response.ToLower() } | Select-Object -First 1
+				return [PSCustomObject]@{
+					Key   = [string]$matchedKey
+					Index = -1
+					Value = $Options[$matchedKey]
+				}
+			}
+		}
+	}
 }
 
 
@@ -1315,17 +1329,17 @@ function Get-TLIndentSpacing {
 
 	$index   = ($Column - 1) + $ColumnIncrease
 
-    if ($index -lt 0 -or $index -gt 4) {
-        throw "Get-TLIndentSpacing: Column plus ColumnIncrease out of the supported range. Column=$Column, ColumnIncrease=$ColumnIncrease."
-    }
+	if ($index -lt 0 -or $index -gt 4) {
+		throw "Get-TLIndentSpacing: Column plus ColumnIncrease out of the supported range. Column=$Column, ColumnIncrease=$ColumnIncrease."
+	}
 
 	$indents = (@($TL.Margin) + $TL.Width)
 
-    $indentSum = if ($index -le 4) {
-        ($indents[0..($index)] | Measure-Object -Sum).Sum
-    }
+	$indentSum = if ($index -le 4) {
+		($indents[0..($index)] | Measure-Object -Sum).Sum
+	}
 
-    return (" " * $indentSum)
+	return (" " * $indentSum)
 }
 
 # add summary line with given $Icon to the $TL.Summary
@@ -1338,7 +1352,7 @@ function Add-TLSummaryLine {
 		[string]$Icon = "None"
 	)
 
-	# RLDetail and TLCounterEnd could pass a "None" value in that come from the user.
+	# RLDetail and TLCounterEnd could pass a "None" value in that comes from the user.
 	# so accept the param, but display an error
 	if ("None" -eq $Icon) {
 		$errorDetails = @{
@@ -1365,8 +1379,8 @@ function Add-TLSummaryLine {
 	})
 }
 
-# splits long lines over multiple rows and maintains an $Column
-# flexible line length based on console width
+# splits long lines over multiple rows and maintains a $Column
+# line length is flexible and based on console width
 function Split-LongLine {
 	param(
 		[ValidateNotNullOrEmpty()]
@@ -1376,9 +1390,9 @@ function Split-LongLine {
 	)
 
 	# wrap at console width if under 120, adjust buffer according to console width
-	$consoleWidth = $Host.UI.RawUI.WindowSize.Width
-	$rightBuffer  = if ($consoleWidth -gt 0 -and $consoleWidth -lt 120 ) { 2 } else { 10 }
-	$maxWidth = $consoleWidth - ((Get-TLIndentSpacing $Column).Length + $rightBuffer)
+	$windowWidth = if ($Host.UI.RawUI.WindowSize) { $Host.UI.RawUI.WindowSize.Width - 10 } else { 80 }
+	$rightBuffer  = if ($windowWidth -gt 0 -and $windowWidth -lt 120 ) { 2 } else { 10 }
+	$maxWidth = $windowWidth - ((Get-TLIndentSpacing $Column).Length + $rightBuffer)
 	$maxWidth = [Math]::Max($maxWidth, 20)	# preserve min line width
 
 	if ($Text.Length -le $maxWidth) { return @($Text) }

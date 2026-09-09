@@ -18,7 +18,7 @@ $testsPassed     = 0
 $testsFailed     = 0
 $summaryExpected = 0   # incremented each time -ShowInSummary is used
 
-function ShouldRun {
+function Test-ShouldRun {
     param([string]$Phase)
 	$script:summaryExpected = 0
     return ([string]::IsNullOrEmpty($TestPhase) -or $TestPhase.ToLower() -ieq $Phase.ToLower())
@@ -88,10 +88,10 @@ function Assert-Throws {
 
 function Write-EventSummary {
 	$types = "Success", "Warning", "Error", "Exception"
-	Write-TLListBegin "Get-TLSummary:"			
+	Write-TLListBegin "Get-TLSummary:"
 	foreach ($type in $types) {
 		Write-TLListItem ("$type = " + @(Get-TLEventSummary -EventType $type).Count)
-	}	
+	}
 	Write-TLListEnd ("Total = " + @(Get-TLEventSummary).Count)
 }
 
@@ -100,7 +100,7 @@ function Invoke-TLSummaryCheck {
 	# =============================================================================
 	# SUMMARY DIAGNOSTIC - assert count and display raw contents
 	# =============================================================================
-	
+
 	#Write-TLListItem "TL.Summary.Count = $TL.Summary.Count"
 
 	if ($TL.Summary.Count -gt 0 -or $script:summaryExpected -gt 0) {
@@ -120,10 +120,10 @@ function Invoke-TLSummaryCheck {
 
 		Test-TL "Summary - entry count matches ShowInSummary calls" {
 			Assert-Equal $script:summaryExpected $TL.Summary.Count "Summary Mismatch: Expected $script:summaryExpected entries - got $($TL.Summary.Count)"
-		}		
+		}
 	}
-	
-	$script:summaryExpected = 0	# reset reader for next section	
+
+	$script:summaryExpected = 0	# reset reader for next section
 }
 
 
@@ -137,7 +137,7 @@ Write-TLHeader -Title "TidyLog Tests" -Summary $headerSummary
 
 
 # -----------------------------------------------------------------------------
-if (ShouldRun "event") {
+if (Test-ShouldRun "event") {
 	Write-TLHeader -Title "Event Log"
 	Write-TLPhase "EVENT" "Check Get-TLSummary return values"
 
@@ -148,8 +148,8 @@ if (ShouldRun "event") {
 	}
 
 	# add some events
-	Write-TLDetail "Status ok"   "confirmed"  -Icon ok -ShowInSummary	
-	Write-TLDetail "Status warn" "low"        -Icon warn -ShowInSummary	
+	Write-TLDetail "Status ok"   "confirmed"  -Icon ok -ShowInSummary
+	Write-TLDetail "Status warn" "low"        -Icon warn -ShowInSummary
 	Write-TLDetail "Status error" "not found"  -Icon Error -ShowInSummary
 	Write-TLError "Error message"
 
@@ -159,28 +159,28 @@ if (ShouldRun "event") {
 		Assert-Equal 1  @(Get-TLEventSummary -EventType "Warning").Count  "Warn events"
 		Assert-Equal 2  @(Get-TLEventSummary -EventType "Error").Count    "Error events"
 	}
-	
-	Write-TLDetail "Status ok"   "confirmed"  -Icon ok -ShowInSummary	
-	Write-TLDetail "Status warn" "low"        -Icon warn -ShowInSummary	
-	Write-TLDetail "Status error" "not found"  -Icon Error -ShowInSummary			
+
+	Write-TLDetail "Status ok"   "confirmed"  -Icon ok -ShowInSummary
+	Write-TLDetail "Status warn" "low"        -Icon warn -ShowInSummary
+	Write-TLDetail "Status error" "not found"  -Icon Error -ShowInSummary
 	Write-TLError "Error message"
-	
+
 	Test-TL "Set-TLLayout - default values" {
 		Write-EventSummary
 		Assert-Equal 2  @(Get-TLEventSummary -EventType "Success").Count  "Success events"
 		Assert-Equal 2  @(Get-TLEventSummary -EventType "Warning").Count  "Warn events"
 		Assert-Equal 4  @(Get-TLEventSummary -EventType "Error").Count    "Error events"
-	}	
-	
+	}
+
 	$script:summaryExpected = 8
-	
-	Invoke-TLSummaryCheck	
-	Write-TLFooter		
+
+	Invoke-TLSummaryCheck
+	Write-TLFooter
 }
 
 
 # -----------------------------------------------------------------------------
-if (ShouldRun "config") {
+if (Test-ShouldRun "config") {
 	Write-TLHeader -Title "Config Tests"
 	Write-TLPhase "CONFIG" "Set-TLLayout / Get-TLLayout / Set-TLPhaseColor / Set-TLGlyphSet"
 	# -----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ if (ShouldRun "config") {
 }
 
 $section = "Timer"
-if (ShouldRun $section) {
+if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase $section "Get-TLElapsed"
 
@@ -298,7 +298,7 @@ if (ShouldRun $section) {
 }
 
 $section = "Header"
-if (ShouldRun $section) {
+if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase $section "Get-TLElapsed"
 
@@ -350,7 +350,7 @@ if (ShouldRun $section) {
 }
 
 $section = "Phase"
-if (ShouldRun $section) {
+if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase $section "Get-TLElapsed"
 
@@ -389,7 +389,7 @@ if (ShouldRun $section) {
 	Test-TL "Write-TLPhase - one char gap" {
 		Write-TLPhase ("Q" * ($TL.Width[0] - $TL.Margin - 1)) "< Should be 1 space gap"
 	}
-	
+
 	Test-TL "Visual" {
 		Confirm-TLVisual "Check 1) no timer, 2) skip newline, 3) yellow phase tag"
 	}
@@ -398,7 +398,7 @@ if (ShouldRun $section) {
 }
 
 $section = "Detail"
-if (ShouldRun $section) {
+if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase $section "Get-TLElapsed"
 
@@ -491,12 +491,12 @@ if (ShouldRun $section) {
 	Test-TL "Write-TLDetail - label exact length of Column2Width" {
 		$longLabel = "Q" * $TL.Width[1]
 		Write-TLDetail $longLabel "< check for two spaces after Label" -Icon ok
-	}	
+	}
 
 	Invoke-TLSummaryCheck
 	Write-TLFooter
-	
-	
+
+
 	Write-TLHeader "All OK Check"
 	Write-TLPhase $section "Get-TLElapsed"
 
@@ -504,11 +504,12 @@ if (ShouldRun $section) {
 		Write-TLDetail "Label" "Info" -Icon Ok -ShowInSummary
 	}
 	Invoke-TLSummaryCheck
-	Write-TLFooter	
+	Write-TLFooter
 }
 
-if (ShouldRun "list") {
-	Write-TLHeader "LIST"
+$section = "List"
+if (Test-ShouldRun $section) {
+	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase "LIST" "Write-TLListBegin / Item / End"
 
 	Test-TL "Write-TLList - happy path with Tick" {
@@ -531,7 +532,7 @@ if (ShouldRun "list") {
 	Test-TL "Write-TLList - custom end text" {
 		Write-TLListBegin "Packages"
 		Write-TLListItem "package-a"
-		Write-TLListEnd "complete" 
+		Write-TLListEnd "complete"
 		Confirm-TLVisual "Ends with 'complete' not 'done'"
 	}
 
@@ -541,30 +542,31 @@ if (ShouldRun "list") {
 		Write-TLListEnd  -Icon Ok
 		Confirm-TLVisual "List begins at margin indent - further left than usual"
 	}
-	
+
 	Test-TL "Write-TLList - show in summary" {
 		Write-TLListBegin "Services restarting"
 		Write-TLListItem -Item "Spooler"
 		Write-TLListItem -Item "BITS"
 		Write-TLListItem -Item "WinRM"
-		Write-TLListEnd -Message "all restarted" -Icon Ok -ShowInSummary	
+		Write-TLListEnd -Message "all restarted" -Icon Ok -ShowInSummary
 		Confirm-TLVisual "Ends with 'all restarted ✓' not 'done ✓'"
-	}	
-	
+	}
+
 	Test-TL "Write-TLList - show in summary" {
 		Write-TLListBegin "Adding to security groups"
 		Write-TLListItem -Item "Finance-Mgmt"
-		Write-TLListItem -Item "Office-North"		
+		Write-TLListItem -Item "Office-North"
 		Write-TLListEnd -Message "2 groups failed" -Icon Error -ShowInSummary
 		Confirm-TLVisual "Ends with '2 groups failed ✗' not 'done ✓'"
-	}		
+	}
 
 	Invoke-TLSummaryCheck
 	Write-TLFooter
 }
 
-if (ShouldRun "progress") {
-	Write-TLHeader "PROGRESS"
+$section = "Progress"
+if (Test-ShouldRun $section) {
+	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase "PROGRESS" "Write-TLProgressDotBegin / Add / End"
 	# -----------------------------------------------------------------------------
 
@@ -581,7 +583,7 @@ if (ShouldRun "progress") {
 		Write-TLProgressDotBegin "Installing"
 		Write-TLProgressDotAdd
 		Write-TLProgressDotAdd
-		Write-TLProgressDotEnd "installed" 
+		Write-TLProgressDotEnd "installed"
 	}
 
 	Test-TL "Write-TLProgressDot - no dots (immediate completion)" {
@@ -591,60 +593,61 @@ if (ShouldRun "progress") {
 
 	Invoke-TLSummaryCheck
 	Write-TLFooter
-	
-	Test-TL "Visual on Summary Table" {	
+
+	Test-TL "Visual on Summary Table" {
 		Confirm-TLVisual "Confirm progress lines display as expected."
 	}
 }
 
-if (ShouldRun "wait") {
-	Write-TLHeader "WAIT"
+$section = "Wait"
+if (Test-ShouldRun $section) {
+	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase "WAIT" "Wait-TLTimed / Wait-TLConditional"
 	# -----------------------------------------------------------------------------
 
 	Test-TL "Wait-TLTimed - short wait (4 seconds, single colour)" {
-		Wait-TLTimed "Short wait" -WaitTime 4
+		Wait-TLTimed "Short wait" -Seconds 4
 	}
 
 	Test-TL "Wait-TLTimed - long wait (10 seconds, colour stages)" {
-		Wait-TLTimed "Long wait" -WaitTime 10 -CompletionMessage "complete" 
-		Confirm-TLVisual "Dots progress through DarkGray → Gray → White stages (default Cool tone)"
+		Wait-TLTimed "Long wait" -Seconds 10 -CompletionMessage "complete"
+		Confirm-TLVisual "Dots progress through DarkGray, Gray, White stages (default Neutral tone)"
 	}
 
 	Test-TL "Wait-TLTimed - Warm tone colour stages" {
-		Wait-TLTimed "Warm tone wait" -WaitTime 10 -CompletionMessage "complete" -Tone Warm
-		Confirm-TLVisual "Dots progress through Red → DarkYellow → Yellow → Gray stages"
+		Wait-TLTimed "Warm tone wait" -Seconds 10 -CompletionMessage "complete" -Tone Warm
+		Confirm-TLVisual "Dots progress through Red, DarkYellow, Yellow, Gray stages"
 	}
 
-	Test-TL "Wait-TLTimed - Neutral tone colour stages" {
-		Wait-TLTimed "Neutral tone wait" -WaitTime 10 -CompletionMessage "complete" -Tone Cool
-		Confirm-TLVisual "Dots progress through DarkBlue → Blue → DarkGreen → Cyan → Gray stages"
+	Test-TL "Wait-TLTimed - Cool tone colour stages" {
+		Wait-TLTimed "Cool tone wait" -Seconds 10 -CompletionMessage "complete" -Tone Cool
+		Confirm-TLVisual "Dots progress through DarkBlue, Blue, Cyan, Gray stages"
 	}
 
 	Test-TL "Wait-TLTimed - negative seconds (error)" {
 		$threw = $false
 		try {
-			Wait-TLTimed "Negative wait" -WaitTime -5
+			Wait-TLTimed "Negative wait" -Seconds -5
 		} catch {
 			$threw = $true
-			Write-TLException $_ -Hint "Check -WaitTime" -Mode Compact
+			Write-TLException $_ -Hint "Check -Seconds" -Mode Compact
 		}
-		Assert-True $threw "Should throw for negative -WaitTime"
+		Assert-True $threw "Should throw for negative -Seconds"
 	}
 
-	Test-TL "Wait-TLTimed - WaitTime exceeds max (error)" {
+	Test-TL "Wait-TLTimed - Seconds exceeds max (error)" {
 		$threw = $false
 		try {
-			Wait-TLTimed "Too high - 88400" -WaitTime 88400
+			Wait-TLTimed "Too high - 88400" -Seconds 88400
 		} catch {
 			$threw = $true
-			Write-TLException $_ -Hint "Check -WaitTime" -Mode Compact
+			Write-TLException $_ -Hint "Check -Seconds" -Mode Compact
 		}
-		Assert-True $threw "Should throw when -WaitTime exceeds 86400"
+		Assert-True $threw "Should throw when -Seconds exceeds 86400"
 	}
 
 	Test-TL "Wait-TLTimed - ShowInSummary" {
-		Wait-TLTimed "Summary wait" -WaitTime 2 -CompletionMessage "done" -ShowInSummary
+		Wait-TLTimed "Summary wait" -Seconds 2 -CompletionMessage "done" -ShowInSummary
 	}
 
 	Test-TL "Visual - Wait-TLTimed calls" {
@@ -653,7 +656,7 @@ if (ShouldRun "wait") {
 
 
 	Test-TL "Wait-TLConditional - condition met immediately" {
-		$result = Wait-TLConditional "Immediate" -Condition { $true } -Timeout 10000
+		$result = Wait-TLConditional "Immediate" -Condition { $true } -TimeoutSec 10
 		Assert-True $result "Should return true when condition met"
 	}
 
@@ -662,12 +665,12 @@ if (ShouldRun "wait") {
 		$result = Wait-TLConditional "Delayed condition" -Condition {
 			$script:counter++
 			$script:counter -ge 3
-		} -Timeout 10000
+		} -TimeoutSec 10
 		Assert-True $result "Should return true when condition eventually met"
 	}
 
 	Test-TL "Wait-TLConditional - condition never met (timeout)" {
-		$result = Wait-TLConditional "Timeout test" -Condition { $false } -Timeout 3000 -TimeoutMessage "timed out as expected"
+		$result = Wait-TLConditional "Timeout test" -Condition { $false } -TimeoutSec 3 -TimeoutMessage "timed out as expected"
 		Assert-True (-not $result) "Should return false on timeout"
 	}
 
@@ -676,30 +679,30 @@ if (ShouldRun "wait") {
 		$result = Wait-TLConditional "2s interval" -Condition {
 			$script:counter++
 			$script:counter -ge 4
-		} -Timeout 10000 -WaitInterval 2
+		} -TimeoutSec 10 -WaitInterval 2
 		Assert-True $result
 		Confirm-TLVisual "Dots appeared roughly 2 seconds apart, not back to back"
 	}
 
 	Test-TL "Wait-TLConditional - Tone parameter passed through" {
-		# Timeout must exceed 7000ms for the multi-stage palette to engage at
+		# Timeout must exceed 7s for the multi-stage palette to engage at
 		# all, otherwise this silently falls back to the single-colour path
 		# regardless of -Tone, and the visual check below would be checking
 		# for something that was never actually possible to see.
-		$result = Wait-TLConditional "Tone check" -Condition { $false } -Timeout 8000 -Tone Warm -TimeoutMessage "timed out"
+		$result = Wait-TLConditional "Tone check" -Condition { $false } -TimeoutSec 8 -Tone Warm -TimeoutMessage "timed out"
 		Assert-True (-not $result) "Should time out as expected"
 		Confirm-TLVisual "Dots during this wait used the Warm palette (Red/DarkYellow/Gray/Yellow), not the default Cool"
 	}
 
 	Test-TL "Wait-TLConditional - ShowInSummary on success" {
-		Wait-TLConditional "Summary condition" -Condition { $true } -Timeout 5000 -CompletionMessage "online" -ShowInSummary | Out-Null
+		Wait-TLConditional "Summary condition" -Condition { $true } -TimeoutSec 5 -CompletionMessage "online" -ShowInSummary | Out-Null
 	}
 
 	Test-TL "Wait-TLConditional - ShowInSummary on timeout" {
-		Wait-TLConditional "Timeout summary" -Condition { $false } -Timeout 2000 -TimeoutMessage "offline" -ShowInSummary | Out-Null
+		Wait-TLConditional "Timeout summary" -Condition { $false } -TimeoutSec 2 -TimeoutMessage "offline" -ShowInSummary | Out-Null
 		Assert-Equal "warn" $TL.Summary[$script:summaryExpected].Icon "Timeout should save as warn"
 	}
-	
+
 	Test-TL "Visual - Wait-TLConditional calls" {
 		Confirm-TLVisual "Wait-TLConditional call display as expected"
 	}
@@ -708,7 +711,7 @@ if (ShouldRun "wait") {
 	Write-TLFooter
 }
 
-if (ShouldRun "counter") {
+if (Test-ShouldRun "counter") {
 	Write-TLHeader "COUNTER"
 	Write-TLPhase "COUNTER" "Write-TLCounter"
 	# -----------------------------------------------------------------------------
@@ -796,8 +799,12 @@ if (ShouldRun "counter") {
 	}
 
 	Test-TL "Write-TLCounter - Different column placements" {
-		for ($i = 1; $i -le 3; $i++) { Write-TLCounter "Sequence 1" $i 3 "Count" 1; Start-Sleep -Milliseconds 100 }
-		for ($i = 1; $i -le 3; $i++) { Write-TLCounter "Sequence 2" $i 3 "Count" 3; Start-Sleep -Milliseconds 100 }
+		for ($i = 1; $i -le 3; $i++) {
+			Write-TLCounter "Sequence 1" $i 3 "Count" 1; Start-Sleep -Milliseconds 100
+		}
+		for ($i = 1; $i -le 3; $i++) {
+			Write-TLCounter "Sequence 2" $i 3 "Count" 3; Start-Sleep -Milliseconds 100
+		}
 	}
 
 	Test-TL "Visual - Wait-TLCounter calls" {
@@ -808,7 +815,7 @@ if (ShouldRun "counter") {
 	Write-TLFooter
 }
 
-if (ShouldRun "percent") {
+if (Test-ShouldRun "percent") {
 	Write-TLHeader "PERCENT"
 	Write-TLPhase "PERCENT" "Write-TLPercent"
 	# -----------------------------------------------------------------------------
@@ -885,8 +892,12 @@ if (ShouldRun "percent") {
 	}
 
 	Test-TL "Write-TLPercent - multi-sequence reset" {
-		for ($p = 0; $p -le 100; $p += 25) { Write-TLPercent "First" $p; Start-Sleep -Milliseconds 50 }
-		for ($p = 0; $p -le 100; $p += 25) { Write-TLPercent "Second" $p; Start-Sleep -Milliseconds 50 }
+		for ($p = 0; $p -le 100; $p += 25) {
+			Write-TLPercent "First" $p; Start-Sleep -Milliseconds 50
+		}
+		for ($p = 0; $p -le 100; $p += 25) {
+			Write-TLPercent "Second" $p; Start-Sleep -Milliseconds 50
+		}
 	}
 
 	Test-TL "Write-TLPercentEnd - incomplete sequence" {
@@ -898,7 +909,9 @@ if (ShouldRun "percent") {
 	}
 
 	Test-TL "Write-TLPercentEnd - on completed sequence (no-op)" {
-		for ($p = 0; $p -le 100; $p += 25) { Write-TLPercent "Complete" $p; Start-Sleep -Milliseconds 50 }
+		for ($p = 0; $p -le 100; $p += 25) {
+			Write-TLPercent "Complete" $p; Start-Sleep -Milliseconds 50
+		}
 		Write-TLPercentEnd -Message "should not appear"   # already done, should be no-op
 		Confirm-TLVisual "Text 'should not appear' is not visible"
 	}
@@ -922,13 +935,17 @@ if (ShouldRun "percent") {
 	}
 
 	Test-TL "Write-TLCounterEnd - completed sequence returns nothing" {
-		for ($i = 1; $i -le 3; $i++) { Write-TLCounter "Seq" $i 3; Start-Sleep -Milliseconds 100 }
+		for ($i = 1; $i -le 3; $i++) {
+			Write-TLCounter "Seq" $i 3; Start-Sleep -Milliseconds 100
+		}
 		$result = Write-TLCounterEnd -Message "should not appear"
 		Assert-Equal $null $result "No-op CounterEnd should return nothing"
 	}
 
 	Test-TL "Write-TLPercentEnd - completed sequence returns nothing" {
-		for ($p = 0; $p -le 100; $p += 25) { Write-TLPercent "Complete2" $p; Start-Sleep -Milliseconds 50 }
+		for ($p = 0; $p -le 100; $p += 25) {
+			Write-TLPercent "Complete2" $p; Start-Sleep -Milliseconds 50
+		}
 		$result = Write-TLPercentEnd -Message "should not appear"
 		Assert-Equal $null $result "No-op PercentEnd should return nothing"
 	}
@@ -941,7 +958,7 @@ if (ShouldRun "percent") {
 	Write-TLFooter
 }
 
-if (ShouldRun "error") {
+if (Test-ShouldRun "error") {
 	Write-TLHeader "ERROR"
 	Write-TLPhase "ERROR" "Write-TLError / Write-TLException"
 	# -----------------------------------------------------------------------------
@@ -971,7 +988,7 @@ if (ShouldRun "error") {
 }
 
 
-if (ShouldRun "exception") {
+if (Test-ShouldRun "exception") {
 	Write-TLHeader "Exception"
 	Write-TLPhase "Exception" "Write-TLException"
 	# -----------------------------------------------------------------------------
@@ -1044,7 +1061,7 @@ if (ShouldRun "exception") {
 } #end ERRORS
 
 
-if (ShouldRun "input") {
+if (Test-ShouldRun "input") {
 	Write-TLHeader "INPUT"
 	Write-TLPhase "SELECTION VALIDATION" "Read-TLSelection - non-interactive validation"
 	# -----------------------------------------------------------------------------
@@ -1069,7 +1086,7 @@ if (ShouldRun "input") {
 	}
 }
 
-if ((ShouldRun "input") -or $TestInput) {
+if ((Test-ShouldRun "input") -or $TestInput) {
 	# -----------------------------------------------------------------------------
 	Write-TLPhase "INPUT" "Read-TLInput"
 	# -----------------------------------------------------------------------------
@@ -1116,22 +1133,27 @@ if ((ShouldRun "input") -or $TestInput) {
 		$options = @("Install Oracle", "Install Amazon Corretto", "Quit")
 		Write-TLDetail "List options to display" ($options -join ', ')
 		$choice = Read-TLSelection -Options $options
-		Assert-True ($choice -is [int]) "Should return an int for array-mode options"
-		Assert-True ($choice -ge 1 -and $choice -le $options.Count) "Returned int should be a valid option position"
-		Write-TLDetail "You entered" $choice
+		Write-TLDetail "You entered: Index: $($choice.Index)  Value: $($choice.Value) "
+
+		Assert-True ($choice.Index -is [int]) "Should return an int for array-mode options"
+		Assert-True ($choice.Index -ge 1 -and $choice.Index -le $options.Count) "Returned Index should be a valid option position"
+		Assert-True ($options -contains $choice.Value) "Returned Value $($choice.Value) should be a valid option"
 	}
 
 	Test-TL "Read-TLSelection - -Prompt -Options -ListMode -Default all correct." {
 		Write-TLDetail "Read-TLSelection : Inine list with custom prompt, hashtable (key/option pairs) and default option" -BeginSection
+		$selectionOptions = [ordered]@{ o = "Install Oracle"; a = "Install Amazon Corretto"; q = "Quit" }
 		$options = @{
 			Prompt = "Select an option"
-			Options = [ordered]@{ o = "Install Oracle"; a = "Install Amazon Corretto"; q = "Quit" }
+			Options = $selectionOptions
 			ListMode = "Inline"
 			Default = "a"
 		}
 		$choice = Read-TLSelection @options
-		Write-TLDetail "You entered" $choice
-		Assert-True ($choice -in @("o","a","q")) "Should return one of the valid hashtable keys"
+		Write-TLDetail "You entered: Key: $($choice.Key)  Value: $($choice.Value) "
+
+		Assert-True ($choice.Key -in @("o","a","q")) "Returned Key $($choice.Key) should return one of the valid hashtable keys"
+		Assert-True ($selectionOptions.Values -contains $choice.Value)  "Returned Value ($($choice.Value)) should be a valid option"
 	}
 
 	# Note: the re-prompt-on-invalid-key loop inside Read-TLSelection is not
@@ -1150,7 +1172,7 @@ if ((ShouldRun "input") -or $TestInput) {
 }
 
 
-if (ShouldRun "glyphs") {
+if (Test-ShouldRun "glyphs") {
 	Write-TLPhase "GLYPHS" "Set-TLGlyphSet - ASCII vs Unicode"
 	# -----------------------------------------------------------------------------
 
@@ -1175,7 +1197,7 @@ if (ShouldRun "glyphs") {
 		Write-TLListBegin "ASCII list"
 		Write-TLListItem "item one"
 		Write-TLListItem "item two"
-		Write-TLListEnd -Tick
+		Write-TLListEnd -Icon Ok
 		Set-TLGlyphSet
 	}
 }
@@ -1203,7 +1225,7 @@ if ("" -eq $TestPhase) {
 	Test-TL "Visual - Footer" {
 		Confirm-TLVisual "Footer shows centred pipe - message | elapsed - banner above"
 	}
-	
+
 	# =============================================================================
 	# PSSA
 	# =============================================================================

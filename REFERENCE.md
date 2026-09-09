@@ -15,14 +15,14 @@
 
 # How to use TidyLog
 
-First run TidyLog-Demo.ps1 to see what's possible. Then come back to this reference manual to see how you can build readable logs using TidyLog functions. 
+First run [TidyLog-Demo.ps1](https://tidylog.dev/demo/) to see what's possible. Then come back to this reference manual to see how you can build readable logs using TidyLog functions. 
 
 ## Header & Footer
 
 Start with a header and end with a footer to bookend the log output.
 
 ### Write-TLHeader
-Prints an header banner with `-Title` and `-Summary`. Self-sizing banner, right-aligned summary. Banner width is calculated automatically from header content with minimum 60 chars, maximum 100.  Starts a timer if one is not already running.
+Prints a header banner with `-Title` and `-Summary`. Self-sizing banner, right-aligned summary. Banner width is calculated automatically from header content with minimum 60 chars, maximum 100.  Starts a timer if one is not already running.
 
 _No required parameters_
 
@@ -289,7 +289,7 @@ _Required parameters are **bold**._
 | Parameter | Type | Description |
 |---|---|---|
 | **`-Label`** | string | Left aligned text. |
-| **`-Percent`** | double | 0–100 value. Accepts `[int]` or `[double]` and rounds up to the nearest whole number. |
+| **`-Percent`** | double | 0 - 100 value. Accepts `[int]` or `[double]` and rounds up to the nearest whole number. |
 | `-Column` | int | Column position for `-Label`.  <br>Accepted values: `1`, `2`, `3`, `4` <br>Default inherits `$TL.DefaultColumn`. |
 | `-PassThru` | switch | Returns the sequence's done state, `$true`/`$false`. |
 
@@ -337,7 +337,7 @@ _Required parameters are **bold**._
 | Parameter | Type | Description |
 |---|---|---|
 | **`-Label`** | string | Left aligned text. |
-| `-WaitTime` | int | Seconds to wait. <br>Default: `10`. |
+| `-Seconds` | int | Seconds to wait. <br>Default: `10`. |
 | `-CompletionMessage` | string | Message shown on completion. <br>Default: `""`. |
 | `-Column` | int | Column position for `-Label`.  <br>Accepted values: `1`, `2`, `3`, `4` <br>Default inherits `$TL.DefaultColumn`. |
 | `-Tone` | string | Sets the color tone for the dots. <br>Accepted values: `Cool`, `Warm`, `Neutral` <br>Default: `Neutral`. |
@@ -362,7 +362,7 @@ _Required parameters are **bold**._
 |---|---|---|
 | **`-Label`** | string | Left aligned text. |
 | **`-Condition`** | scriptblock | Evaluated after each `-WaitInterval`. Must return `$true`/`$false`. |
-| `-Timeout` | int | Timeout ceiling in milliseconds. <br>Default: `15000` (15 seconds). |
+| `-TimeoutSec` | int | Timeout ceiling in seconds. <br>Default: `15`. |
 | `-CompletionMessage` | string | Message shown when `-Condition` is met. <br>Default: `None`, shows just the glyph. |
 | `-TimeoutMessage` | string | Message shown if the wait times out. <br>Default: `"timed out"`. |
 | `-WaitInterval` | int | Seconds between `-Condition` polls. <br>Default: `1`. |
@@ -473,14 +473,14 @@ Displays options and captures a user selection. `-Options` accepts either an arr
 
 Validates input: `-Options` must be an ordered hashtable or an array. If neither, the function will throw an error.
 
-Return value: Returns a valid key entered in the console. See `-Options` for exact return type. Return value can be used an an index into the passed array or hashtable.
+Return value: Returns a PSCustomObject that contains `Key`, `Index` and `Value`. `Value` always contains the string representation of the selected option.  See `-Options` for `Key`/`Index` return values. Returned data can be used as is, or as an index/key back into the passed array or hashtable.
 
 _Required parameters are **bold**._
 
 | Parameter | Type | Description |
 |---|---|---|
 | **`-Prompt`** | string | The instruction that sits above the list of options. The default, which can be used in most cases, is `"Press the key in [brackets] to select the option:"`. |
-| **`-Options`** | object | Accepts array or ordered hashtable. <br>Arrays: Using an array means the function will auto-display numbers next to each choice. This option is limited to 9 entries in the array. Returns the `[int]` value of the selected number. <br>Hashtable: Pass custom keys by using a hashtable. Returns the exact hashtable key that relates to the chosen option. |
+| **`-Options`** | object | Accepts array or ordered hashtable. <br>Arrays: Using an array means the function will auto-display numbers next to each choice. This option is limited to 9 entries in the array. Returned PSCustomObject has `Index` as the `[int]` value of the selected number. <br>Hashtable: Pass custom keys by using a hashtable. Returned PSCustomObject has `Key` as the hashtable key for the chosen option. |
 | `-Default` | string | The default selection. Allows user to press enter without typing a value. |
 | `-ListMode` | string | Indicates how the options should be displayed, all options on one line or one option per line. <br>Accepted values: `Inline`, `Stack`. <br>Default: `Stack`|
 | `-Column` | int | Column position for `-Prompt`.  <br>Accepted values: `1`, `2`, `3`, `4` <br>Default inherits `$TL.DefaultColumn`. |
@@ -489,8 +489,8 @@ Example:
 
 ```powershell
 # minimal setup, just pass an array
-$options = @("Install Oracle Java", "Install Amazon Corretto", "Quit")
-$choice = Read-TLSelection -Options $options
+$choice = Read-TLSelection -Options @("Install Oracle Java", "Install Amazon Corretto", "Quit")
+Write-TLDetail "Selected Value" $choice.Value
 
 # fully configured
 $options = @{
@@ -500,6 +500,7 @@ $options = @{
     Default = "a"
 }
 $choice = Read-TLSelection @options
+Write-TLDetail "Selected Key" $choice.Key
 ```
 
 ## Adjust Layout
@@ -538,7 +539,7 @@ _No required parameters_
 
 | Parameter | Type | Description |
 |---|---|---|
-| `-Margin` | int | Left margin, in characters, applied before all output. Default: `2`. Valid range 2–16. |
+| `-Margin` | int | Left margin, in characters, applied before all output. Default: `2`. Valid range 2 - 16. |
 | `-Column1Width` | int | Character width of the first column. <br>Default: `14`. Valid range 8 - 30. |
 | `-Column2Width` | int | Character width of the second column. <br>Default: `18`. Valid range 12 - 40. |
 | `-Column3Width` | int | Character width of the third column. <br>Default: `20`. Valid range 12 - 40. |

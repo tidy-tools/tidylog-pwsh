@@ -58,7 +58,7 @@ Write-TLPhase "WOL" "Wake NAS"
     # Send-WOL $NASMac
     $nasOnline = Wait-TLConditional -Label "Waiting for NAS" `
         -Condition { $script:_wolAttempt++; $script:_wolAttempt -ge 4 } `
-        -Timeout 10000 -WaitInterval 1 -CompletionMessage "\\NAS-01 online"
+        -TimeoutSec 10 -WaitInterval 1 -CompletionMessage "\\NAS-01 online"
     $script:_wolAttempt = 0
 
     if (-not $nasOnline) {

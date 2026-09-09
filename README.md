@@ -13,7 +13,9 @@
 
 It's spacious console output for PowerShell.
 
-Easy to use functions that provide great layout with zero config. 
+A set of easy to use functions that provide great layout with zero config.
+
+Intended for use with interactive PowerShell scripts.
 
 v0.9.0 · PowerShell 5.1+ (Windows) · PS 7+ (Windows/macOS/Linux) · MIT · [SemVer 2.0.0](https://semver.org/spec/v2.0.0.html)
 
@@ -21,17 +23,17 @@ v0.9.0 · PowerShell 5.1+ (Windows) · PS 7+ (Windows/macOS/Linux) · MIT · [Se
 
 Advantages over DIY layout:
 - Zero manual layout needed. **No more layout coding**.
-- Structured output with minimal code overhead. Close to using vanilla PS commands.
-- Semantic functions describe the output. The code self documents.
+- Semantic functions describe the output so that code self documents.
+- Structured output with minimal code overhead.
 - Styled helpers for loop counters, input, selection and errors.
 
-Here's the difference:
+The difference:
 
 **> _Without_ TidyLog**  : Write-Host with occasional spacing.
 
 ![Plain Write-Host output of an install script, with no structure or hierarchy](./images/without-tidylog.png)
 
-**> _With_ TidyLog** : The same output transformed by using space, structure and consistency. Easy to scan **quickly**.
+**> _With_ TidyLog** : The same output transformed by using space, structure and consistency. It's easy to scan **quickly**.
 
 ![Same install script using TidyLog. Structured phases, semantic colour, and a summary block](./images/with-tidylog.png)
 
@@ -72,36 +74,36 @@ Write-TLFooter -Message "Install complete"
 
 These demos are runnable examples showing how to use the TidyLog library.  
 
-To run the demo, download [TidyLog Demo Pack](#link) and unzip to new folder. `cd` to the new folder and run the commands below.
+To run the demo, download [TidyLog Demo Pack](#https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder. `cd` to the new folder and run the commands below.
 
-*> Windows blocks downloaded scripts by default, so prefix the file name with 
+*> Windows can block downloaded scripts by default, so optionally prefix the file name with 
 `powershell -ep Bypass -f`.*
 
 
 ```powershell
 # run the full demo to see how each function works
-powershell -ep Bypass -f .\TidyLog-Demo.ps1
+.\TidyLog-Demo.ps1
 
 # filter to a specific functional section
-powershell -ep Bypass -f .\TidyLog-Demo.ps1 -Phase PROGRESS
+.\TidyLog-Demo.ps1 -Phase PROGRESS
 # skip the timed/slower demo sections
-powershell -ep Bypass -f .\TidyLog-Demo.ps1 -NoWait -NoCounters -NoInput
+.\TidyLog-Demo.ps1 -NoWait -NoCounters -NoInput
 
 # run the before/after comparison
-powershell -ep Bypass -f .\TidyLog-With.ps1      # with TidyLog
-powershell -ep Bypass -f .\TidyLog-Without.ps1   # without TidyLog
+.\TidyLog-With.ps1      # with TidyLog
+.\TidyLog-Without.ps1   # without TidyLog
 
 # launch before/after side by side in Windows Terminal
 # NOTE: This launcher is Windows only
-powershell -ep Bypass -f .\TidyLog-WinLaunch.ps1
+.\TidyLog-WinLaunch.ps1
 ```
 
 # Requirements
 
 - PowerShell 5.1 or later
-- Dark terminal background. TidyLog's color palette is optimised for dark themes. Windows Terminal, VSCode integrated terminal with a dark theme, and most modern PS setups work correctly out of the box. For light backgrounds use `Set-TLGlyphSet -CharSet ASCII` as a partial workaround. A full light theme variant is possible if there is demand.
+- Dark terminal background. TidyLog's color palette is optimised for dark themes. Windows Terminal, VSCode integrated terminal with a dark theme, and most modern PS setups work correctly out of the box. A full light theme variant is possible if there is demand.
 - Works best on console of 80+ chars width.
-- Unicode support for full glyph rendering. Use `Set-TLGlyphSet -CharSet ASCII` for older consoles or PS 2+ environments.
+- Unicode support for full glyph rendering. Use `Set-TLGlyphSet -CharSet ASCII` for older consoles.
 - Designed for interactive console sessions. Functions that read the console window (Write-TLPhase -ShowElapsed) or use console rewrite (e.g. Write-TLCounter's in-place rewrite) assume a live terminal is attached. Output redirected to a file, scheduled tasks, CI/CD runners, or some remote sessions may not expose these properties reliably. Start-Transcript does not faithfully reproduce the console output.
 
 ---
@@ -110,13 +112,13 @@ powershell -ep Bypass -f .\TidyLog-WinLaunch.ps1
 
 **TidyLog is opinionated**. It makes considered decisions so you can dedicate thought to script logic, not layout. Sensible defaults, consistent colors and clean layout ready to go.
 
-**Less is more, but only when less is genuinely enough.** Every element earns its place.
+**The library feels natural.** Every function is an imperative statement that immediately gets something done. They allow you to focus on the task instead of thinking about the tool.
+
+**Less is more, but only when less is genuinely enough.** Every element is designed to earn its place.
 
 **Consistency.** Grid, columns, alignment, sections and colors.
 
 **Prefer space over decoration.** Space communicates when decoration cannot.
-
-**The library feels natural.** Every function is an imperative statement that immediately gets something done. They allow you to focus on the task instead of thinking about the tool.
 
 # Links
 
