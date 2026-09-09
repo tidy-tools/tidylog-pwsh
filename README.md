@@ -50,7 +50,7 @@ Install-Module TidyLog-pwsh
 ```
 
 To create an example file that uses dot-source TidyLog:  
-1) Download [TidyLog Demo Pack](#link) and unzip to new folder.
+1) Download [TidyLog Demo Pack](#https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder.
 2) In the new folder, create a new .ps1 file and paste in this code:
 ```powershell
 . "$PSScriptRoot\TidyLog.ps1"
