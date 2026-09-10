@@ -1088,7 +1088,7 @@ function Read-TLInput {
 			$secureString = (Read-Host $paddedPrompt -AsSecureString)
 			$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureString)
 			try {
-				return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+				return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
 			} finally {
 				[System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
 			}

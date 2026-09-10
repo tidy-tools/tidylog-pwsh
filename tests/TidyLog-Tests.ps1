@@ -1133,7 +1133,7 @@ if ((Test-ShouldRun "input") -or $TestInput) {
 		Assert-True ($result -is [System.Security.SecureString]) "Should return SecureString"
 
 		$decrypted = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($result)
-		$result = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($decrypted)
+		$result = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($decrypted)
 		Write-TLDetail "You entered" $result
 
     }
@@ -1256,7 +1256,8 @@ if ("" -eq $TestPhase) {
 
 	Write-TLPhase "PSSA" "Invoke-ScriptAnalyzer on TidyLog.ps1"
 
-	$analysisResults = Invoke-ScriptAnalyzer -Path "$PSScriptRoot\..\TidyLog.ps1" -Settings "$PSScriptRoot\..\PSScriptAnalyzerSettings.psd1"
+	$parentDir = Split-Path $PSScriptRoot -Parent
+	$analysisResults = Invoke-ScriptAnalyzer -Path (Join-Path $parentDir "TidyLog.ps1") -Settings (Join-Path $parentDir "PSScriptAnalyzerSettings.psd1")	
 
 	if ($analysisResults.Count -eq 0) {
 		Write-TLDetail "PSSA passed" "zero findings" -Icon ok -ShowInSummary
