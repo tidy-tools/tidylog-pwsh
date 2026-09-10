@@ -362,7 +362,7 @@ function Write-TLFooter {
 		Write-Host ""
 
 		# write out each summary line
-		$minDots   = 4
+		$minDots = 4
 		foreach ($entry in $entries) {
 			$displayLabel  = $entry.Label
 			$displayDetail = $entry.Detail
@@ -375,7 +375,7 @@ function Write-TLFooter {
 				$contentLen    = $displayLabel.Length + $displayDetail.Length + $buffer + $minDots
 			}
 
-			$contentLen  = $displayLabel.Length + $displayDetail.Length + $buffer	# remove minDots to get the accurate content length
+			$contentLen = $displayLabel.Length + $displayDetail.Length + $buffer	# remove minDots to get the accurate content length
 			$dotCount = [Math]::Max($minDots, ($tableWidth - $contentLen))
 			$dots	  = "." * $dotCount
 			$iconInfo = Get-TLIconInfo $entry.Icon
@@ -401,7 +401,7 @@ function Write-TLFooter {
 	Write-Host $paddedMessage -NoNewline -ForegroundColor Gray
 
 	if ($null -ne $TL.StartTime) {
-		$elapsed        = Get-TLElapsed
+		$elapsed      = Get-TLElapsed
 		$TL.StartTime = $null
 		Write-Host "  |" -NoNewline -ForegroundColor DarkGray
 		Write-Host ("  " + $elapsed) -ForegroundColor DarkGray
@@ -525,7 +525,7 @@ function Write-TLDetail {
 		Write-Host ""
 	}
 
-	$iconInfo    = Get-TLIconInfo $Icon
+	$iconInfo = Get-TLIconInfo $Icon
 
 	if ([string]::IsNullOrEmpty($Detail)) {
 		$paddedLabel = Get-TLPaddedText -Text $Label -Column $Column -Icon $Icon
@@ -568,7 +568,7 @@ function Write-TLListBegin {
 
 	$TL.ListLabel = $Label	# used in TLListEnd when -ShowInSummary is passed
 
-	$paddedLabel  = Get-TLPaddedText -Text $Label -Column $Column
+	$paddedLabel = Get-TLPaddedText -Text $Label -Column $Column
 	Write-Host $paddedLabel -NoNewline -ForegroundColor DarkGray
 }
 
@@ -716,8 +716,8 @@ function Wait-TLTimed {
 		[ValidateNotNullOrEmpty()]
 		[string]$Label,
 		[ValidateRange(1, 86400)]	# max timeout 24 hours
-		[int]$Seconds			  = 10,
-		[string]$CompletionMessage  = "",
+		[int]$Seconds			   = 10,
+		[string]$CompletionMessage = "",
 		[ValidateRange(1,4)]
 		[int]$Column = $TL.DefaultColumn,
 		[ValidateSet("Warm","Cool","Neutral")]
@@ -796,7 +796,7 @@ function Wait-TLConditional {
 	Invoke-TLWait -Label $Label -Column $Column
 
 	# display dots while waiting for condition to be met
-	$conditionMet   = Invoke-TLDotDisplay -Duration $TimeoutSec -WaitInterval $WaitInterval -Condition $Condition -Tone $Tone
+	$conditionMet = Invoke-TLDotDisplay -Duration $TimeoutSec -WaitInterval $WaitInterval -Condition $Condition -Tone $Tone
 
 	# output the result based on $conditionMet
 	$msg = $CompletionMessage
@@ -879,8 +879,8 @@ function Write-TLCounter {
 	$TL.CounterState.LastValue = $Current	# record latest values for future comparison, see above ^
 	$TL.CounterState.LastTotal = $Total
 
-	$iconInfo  = Get-TLIconInfo Ok
-	$outText   = "$Current of $Total  ", "$Current of $Total $($iconInfo.Glyph) "
+	$iconInfo = Get-TLIconInfo Ok
+	$outText  = "$Current of $Total  ", "$Current of $Total $($iconInfo.Glyph) "
 
 	if ($As.Contains("Percent")) {
 		$pct = ([double]$Current / [double]$Total) * 100
@@ -1068,7 +1068,7 @@ function Read-TLInput {
 		[int]$Column = $TL.DefaultColumn
 	)
 
-	$promptText	  = if (-not [string]::IsNullOrEmpty($Default)) {
+	$promptText	= if (-not [string]::IsNullOrEmpty($Default)) {
 		"$Prompt [$Default]"
 	} else {
 		$Prompt
@@ -1188,7 +1188,7 @@ function Read-TLSelection {
 			""
 		}
 
-		$response   = Read-TLInput -Prompt $promptText -Column $Column -Default $Default
+		$response = Read-TLInput -Prompt $promptText -Column $Column -Default $Default
 		if ($response.ToLower() -in $validKeys) {
 			Write-Host ""	# create space below this block
 			if ($Options -is [array]) {
@@ -1310,7 +1310,7 @@ function Write-TLException {
 
 	# standard mode output
 	if ($Mode -ne "Compact") {
-		$typeName 	= $ErrorRecord.Exception.GetType().Name
+		$typeName = $ErrorRecord.Exception.GetType().Name
 
 		Write-TLDetail $primaryMsg -Icon Error -BeginSection
 		Write-TLDetail "Type" $typeName
@@ -1324,7 +1324,7 @@ function Write-TLException {
 	}
 
 	if ($Mode -eq "Full") {
-		$codeLine   = $ErrorRecord.InvocationInfo.Line.Trim()
+		$codeLine = $ErrorRecord.InvocationInfo.Line.Trim()
 
 		if (-not [string]::IsNullOrEmpty($codeLine)) {
 			Write-TLDetail "Line" $codeLine
@@ -1402,7 +1402,7 @@ function Get-TLIndentSpacing {
 		[int]$ColumnIncrease = 0
 	)
 
-	$index   = ($Column - 1) + $ColumnIncrease
+	$index = ($Column - 1) + $ColumnIncrease
 
 	if ($index -lt 0 -or $index -gt 4) {
 		throw "Get-TLIndentSpacing: Column plus ColumnIncrease out of the supported range. Column=$Column, ColumnIncrease=$ColumnIncrease."
@@ -1448,9 +1448,9 @@ function Add-TLSummaryLine {
 	$Icon = (Get-Culture).TextInfo.ToTitleCase($Icon)
 
 	$TL.Summary.Add(@{
-		Label = "$prefix$Label"
-		Detail = if ([string]::IsNullOrEmpty($Detail)) { "" } else { $Detail }
-		Icon = $Icon
+		Label  = "$prefix$Label"
+		Detail = $Detail
+		Icon   = $Icon
 	})
 }
 
