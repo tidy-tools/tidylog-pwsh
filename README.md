@@ -9,7 +9,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-# What is TidyLog 
+# What is TidyLog
 
 It's spacious console output for PowerShell.
 
@@ -44,12 +44,9 @@ For existing code:
 ```powershell
 # dot-source and go
 . .\TidyLog.ps1
-
-# or install from the Gallery
-Install-Module TidyLog-pwsh
 ```
 
-To create an example file that uses dot-source TidyLog:  
+To create an example file that uses dot-source TidyLog:
 1) Download [TidyLog Demo Pack](https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder.
 2) In the new folder, create a new .ps1 file and paste in this code:
 ```powershell
@@ -62,7 +59,7 @@ Write-TLHeader -Title "MyScript" -Summary "v2.0","prod","full install"
 Write-TLPhase "SERVER" "Installing Server"
     Write-TLDetail "Java"            "21.0.3"
     Write-TLDetail "Disk space"      "low"      -Icon warn
-    Write-TLDetail "Server install"  "complete" -Icon ok  -ShowInSummary	
+    Write-TLDetail "Server install"  "complete" -Icon ok  -ShowInSummary
 
 # close with a footer
 Write-TLFooter -Message "Install complete"
@@ -72,11 +69,11 @@ Write-TLFooter -Message "Install complete"
 
 ## Demo Scripts
 
-These demos are runnable examples showing how to use the TidyLog library.  
+These demos are runnable examples showing how to use the TidyLog library.
 
 To run the demo, download [TidyLog Demo Pack](https://github.com/tidy-tools/tidylog-pwsh/releases/download/v0.9.0/TidyLog-DemoPack-0.9.0.zip) and unzip to new folder. `cd` to the new folder and run the commands below.
 
-*> Windows can block downloaded scripts by default, so optionally prefix the file name with 
+*> Windows can block downloaded scripts by default, so optionally prefix the file name with
 `powershell -ep Bypass -f`.*
 
 
@@ -122,11 +119,11 @@ To run the demo, download [TidyLog Demo Pack](https://github.com/tidy-tools/tidy
 
 # Links
 
-https://github.com/tidy-tools/tidylog-pwsh  
+https://github.com/tidy-tools/tidylog-pwsh
 https://tidylog.dev
 
 # Name and usage
-"TidyLog" refers to this design system and its implementations maintained under the tidy-tools GitHub organisation. 
+"TidyLog" refers to this design system and its implementations maintained under the tidy-tools GitHub organisation.
 Other projects in other ecosystems happen to share the name (there are tidylog packages in R and Python that are unrelated). If you build something in the TidyLog design tradition, let me know. If you build something quite different, then giving it a different name reduces confusion for everyone.
 
 # Contributing
