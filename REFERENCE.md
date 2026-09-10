@@ -15,7 +15,7 @@
 
 # How to use TidyLog
 
-First run [TidyLog-Demo.ps1](https://tidylog.dev/demo/) to see what's possible. Then come back to this reference manual to see how you can build readable logs using TidyLog functions. 
+First run [TidyLog-Demo.ps1](https://tidylog.dev/demo/) to see what's possible. Then come back to this reference manual to see how you can build readable logs using TidyLog functions.
 
 ## Header & Footer
 
@@ -32,8 +32,8 @@ _No required parameters_
 | `-Summary` | string[] | Right aligned summary of up to 4 words/phrases. Each entry split by `·`/`.` (Unicode/ASCII). |
 | `-SummaryColor` | ConsoleColor | Sets the color of the right aligned summary. Must be a valid System.ConsoleColor. |
 
-### Write-TLFooter 
-Closing banner with optional `-Message` and elapsed runtime. Auto-renders a summary table if entries exist (see `Write-TLDetail -ShowInSummary`) and has a short pause before dropping back to the command line.  
+### Write-TLFooter
+Closing banner with optional `-Message` and elapsed runtime. Auto-renders a summary table if entries exist (see `Write-TLDetail -ShowInSummary`) and has a short pause before dropping back to the command line.
 
 If called without a matching `Write-TLHeader` (no timer started), the elapsed runtime is omitted. Stops and clears a running timer that was started with a previous `Write-TLHeader`.
 
@@ -43,20 +43,20 @@ _No required parameters_
 |---|---|---|
 | `-Message` | string | Completion message. Defaults to `Done`. |
 
-Example: 
+Example:
 
 ```powershell
 # call Write-TLHeader and Write-TLFooter without params for default appearance
 Write-TLHeader
 
 Write-TLPhase "SERVER" "Installing Server"
-    Write-TLDetail "Server install"  "complete" -Icon Ok  -ShowInSummary	
+    Write-TLDetail "Server install"  "complete" -Icon Ok  -ShowInSummary
 
 Write-TLFooter
 ```
 
 ## Tracking Events
-Some functions in TidyLog accept a `-ShowInSummary` parameter. This is for two reasons:  
+Some functions in TidyLog accept a `-ShowInSummary` parameter. This is for two reasons:
 1. It requests that a log entry be included in the summary table. The summary table is displayed when `Write-TLFooter` is called.
 2. It stores the event detail and event type (`Success`, `Warning`, etc) internally so it can be later retrieved using `Get-TLEventSummary`.
 
@@ -95,9 +95,9 @@ Text is layed out in a grid using four available columns. Details of this layout
 | `Write-TLListItem` | Adds an item to an inline list.
 | `Write-TLListEnd` | Complete an inline list of items with text and optional icon.  |
 
-### Write-TLPhase 
+### Write-TLPhase
 Opens a phase with a margin aligned `-Tag` and optional `-Description`. Always preceded by a newline unless suppressed with `-SkipLeadingNewline`.
-  
+
 _Required parameters are **bold**._
 
 | Parameter | Type | Description |
@@ -108,7 +108,7 @@ _Required parameters are **bold**._
 | `-ShowElapsed` | switch | Shows right aligned script runtime in format `00m 00s`. |
 | `-SkipLeadingNewline` | switch | Suppresses the newline insertion above the `-Tag`. |
 
-### Write-TLDetail 
+### Write-TLDetail
 Displays a `-Label` with optional `-Detail`. Sits indented within a phase. Add one or more `Write-TLDetail` to any phase. Color the `-Detail` text by specifying an `-Icon`. See [About the Grid Layout](#about-the-grid-layout) for indent overview.
 
 _Required parameters are **bold**._
@@ -119,7 +119,7 @@ _Required parameters are **bold**._
 | `-Detail` | string | Additional detail relating to the label. Positioned right of `-Label` in the column after `-Label`. |
 | `-Icon` | string | Colors the `-Detail` text and appends a glyph. <br>Accepted values: `Ok`, `Warn`, `Error`, `None`. <br>Default: `None`. |
 | `-Column` | int | Column position for `-Label`.  <br>Accepted values: `1`, `2`, `3`, `4` <br>Default inherits `$TL.DefaultColumn`. |
-| `-ShowInSummary` | switch | Shows `-Label` and `-Detail` in the footer summary table. Requires `-Icon Ok|Warn|Error`. |
+| `-ShowInSummary` | switch | Shows `-Label` and `-Detail` in the footer summary table. Requires `-Icon Ok\|Warn\|Error`. |
 | `-BeginSection` | switch | Inserts a new line above `-Label`. Useful for starting sub-sections within a phase. |
 | `-EndSection` | switch | Inserts a new line below `-Detail`. |
 
@@ -129,7 +129,7 @@ Example:
 Write-TLPhase "SERVER" "Installing Server"
     Write-TLDetail "Java"            "21.0.3"
     Write-TLDetail "Disk space"      "low"      -Icon Warn
-    Write-TLDetail "Server install"  "complete" -Icon Ok  -ShowInSummary	
+    Write-TLDetail "Server install"  "complete" -Icon Ok  -ShowInSummary
 ```
 
 ### Write-TLListBegin
@@ -152,7 +152,7 @@ Write-TLListItem  "service account set"
 Write-TLListEnd   -Icon Ok
 ```
 
-### Write-TLListItem 
+### Write-TLListItem
 
 Adds an item to an inline list. First added item is positioned in the column to the right of the `-Label` created by `Write-TLListBegin`. Subsequent items appended to same line and are separated by `·`/`.` (Unicode/ASCII).
 
@@ -162,7 +162,7 @@ _Required parameters are **bold**._
 |---|---|---|
 | **`-Item`** | string | Text to be added. |
 
-### Write-TLListEnd 
+### Write-TLListEnd
 
 Closes the list. Accepts optional confirmation `-Message` and `-Icon`.
 
@@ -172,7 +172,7 @@ _No required parameters_
 |---|---|---|
 | `-Message` | string |  Text for the closing message. <br>Default: `done`. |
 | `-Icon` | string | Colors the `-Message` text and appends a glyph. <br>Accepted values `Ok`, `Warn`, `Error`, `None`. <br>Default: `None`. |
-| `-ShowInSummary` | switch | Shows `-Message` in the footer summary table. Requires `-Icon Ok|Warn|Error`. |
+| `-ShowInSummary` | switch | Shows `-Message` in the footer summary table. Requires `-Icon Ok\|Warn\|Error`. |
 
 
 ## Animate Progress
@@ -247,7 +247,7 @@ _Required parameters are **bold**._
 | `-Column` | int | Column position for `-Label`.  <br>Accepted values: `1`, `2`, `3`, `4` <br>Default inherits `$TL.DefaultColumn`. |
 | `-PassThru` | switch | Optionally returns the sequence's done state. <br>`$true`  = `-Current` reached `-Total`. <br>`$false` = `-Current` did not reach `-Total`. |
 
-### Write-TLCounterEnd 
+### Write-TLCounterEnd
 Clean closure of an incomplete `Write-TLCounter` counter sequence. Use when `Write-TLCounter` exits early and the last call to `Write-TLCounter -PassThru` returned `$false`.
 
 _No required parameters_
@@ -256,7 +256,7 @@ _No required parameters_
 |---|---|---|
 | `-Message` | string | Closing message. <br>Default is `""` that closes the line cleanly. |
 | `-Icon` | string | Colors the `-Message` text and appends a glyph. <br>Accepted values `Ok`, `Warn`, `Error`, `None`. <br>Default: `None`. |
-| `-ShowInSummary` | switch | Saves to summary. Requires `-Message` and `-Icon Ok|Warn|Error` to create the summary line. |
+| `-ShowInSummary` | switch | Saves to summary. Requires `-Message` and `-Icon Ok\|Warn\|Error` to create the summary line. |
 
 Example:
 
@@ -276,7 +276,7 @@ for ($i = 1; $i -le $files.Count; $i++) {
 
 ### Write-TLPercent
 
-Display in-place percentage with a `-Label`. 
+Display in-place percentage with a `-Label`.
 
 Convenience function that uses `Write-TLCounter -As PercentWhole`. Always integer display. For two-decimal precision use `Write-TLCounter` directly with `-As PercentExact`.
 
@@ -303,7 +303,7 @@ _No required parameters_
 |---|---|---|
 | `-Message` | string | Closing message. <br>Default is "" that closes the line cleanly. |
 | `-Icon` | string | Colors the `-Message` text and appends a glyph. <br>Accepted values `Ok`, `Warn`, `Error`, `None`. <br>Default: `None`. |
-| `-ShowInSummary` | switch | Saves to summary. Requires `-Message` and `-Icon Ok|Warn|Error` to create the summary line. |
+| `-ShowInSummary` | switch | Saves to summary. Requires `-Message` and `-Icon Ok\|Warn\|Error` to create the summary line. |
 
 Example:
 
@@ -312,8 +312,8 @@ $pcts = @(0, 15, 33, 50)
 foreach ($p in $pcts) {
   $complete = Write-TLPercent "Searching files" $p -PassThru
 }
-if (-not $complete) { 
-  Write-TLPercentEnd "Incomplete count" -Icon Warn -ShowInSummary 
+if (-not $complete) {
+  Write-TLPercentEnd "Incomplete count" -Icon Warn -ShowInSummary
 }
 ```
 
@@ -373,18 +373,18 @@ _Required parameters are **bold**._
 Example:
 ```powershell
 $params = @{
-    Label = "Waiting for NAS" 
-    Condition = { Test-NetConnection $nas -Quiet } 
+    Label = "Waiting for NAS"
+    Condition = { Test-NetConnection $nas -Quiet }
     Timeout = 60000
     }
 $isNASOnline = Wait-TLConditional @params
-if (-not $isNASOnline) { 
+if (-not $isNASOnline) {
     Write-TLError "NAS unreachable" `
-    -Hint "Check NAS power and network" 
+    -Hint "Check NAS power and network"
 }
 ```
 
-## Handle Errors 
+## Handle Errors
 
 Functions to capture Errors and Exceptions and display within the grid format.
 
@@ -412,11 +412,11 @@ _Required parameters are **bold**._
 | `-Mode` | string  | Display mode dictates amount of detail displayed. <br>Accepted values: `Compact`, `Standard`, `Full` <br>Defaults to `Standard`. <br>`Compact` includes the exception name, file name and line. <br>`Standard` adds exception type and inner exception. <br>`Full` adds a stack trace. <br>All modes include optional `-Hint` and auto-timestamp. |
 | `-Hint` | string | Hint describing how to resolve the exception. |
 
-Example: 
+Example:
 
 ```powershell
-try { 
-  Get-Item "C:\does-not-exist\file.exe" -ErrorAction Stop 
+try {
+  Get-Item "C:\does-not-exist\file.exe" -ErrorAction Stop
 } catch {
   Write-TLException $_ `
     -Mode Compact `
@@ -494,7 +494,7 @@ Write-TLDetail "Selected Value" $choice.Value
 
 # fully configured
 $options = @{
-    Prompt = "Select a file" 
+    Prompt = "Select a file"
     Options = [ordered]@{ a = "File A"; b = "File B"; q = "Quit" }
     ListMode = "Inline"
     Default = "a"
@@ -616,7 +616,7 @@ Glyph table:
 
 ### Get-TLLayout
 
-Returns the current layout values as a `[PSCustomObject]` containing `Margin`, `Column1Width`, `Column2Width`, `Column3Width`, `Column4Width`, and `DefaultColumn`.  
+Returns the current layout values as a `[PSCustomObject]` containing `Margin`, `Column1Width`, `Column2Width`, `Column3Width`, `Column4Width`, and `DefaultColumn`.
 
 
 ## Display Runtime
