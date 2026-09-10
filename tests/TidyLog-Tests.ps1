@@ -309,7 +309,7 @@ if (Test-ShouldRun $section) {
 $section = "Header"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
-	Write-TLPhase $section "Get-TLElapsed"
+	Write-TLPhase $section "Write-TLHeader"
 
 	Test-TL "Write-TLHeader - starts timer" {
 		$TL.StartTime = $null
@@ -363,7 +363,7 @@ if (Test-ShouldRun $section) {
 $section = "Phase"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
-	Write-TLPhase $section "Get-TLElapsed"
+	Write-TLPhase $section "Write-TLPhase"
 
 	Test-TL "Write-TLPhase - resets DefaultColumn to 2" {
 		$TL.DefaultColumn = 1
@@ -413,7 +413,7 @@ if (Test-ShouldRun $section) {
 $section = "Detail"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
-	Write-TLPhase $section "Get-TLElapsed"
+	Write-TLPhase $section "Write-TLDetail"
 
 	Test-TL "Write-TLDetail - label only" {
 		Write-TLDetail "Label only" -Icon Warn -ShowInSummary
