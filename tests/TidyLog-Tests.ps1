@@ -19,9 +19,10 @@ $testsFailed     = 0
 $summaryExpected = 0   # incremented each time -ShowInSummary is used
 
 function Test-ShouldRun {
-    param([string]$Phase)
+    param([string]$PhaseToRun)
+	
 	$script:summaryExpected = 0
-    return ([string]::IsNullOrEmpty($TestPhase) -or $TestPhase.ToLower() -ieq $Phase.ToLower())
+    return ([string]::IsNullOrEmpty($TestPhase) -or $TestPhase.ToLower() -ieq $PhaseToRun.ToLower())
 }
 
 function Confirm-TLVisual {
@@ -97,9 +98,9 @@ function Write-EventSummary {
 
 function Invoke-TLSummaryCheck {
 
-	# =============================================================================
+	# -----------------------------------------------------------------------------
 	# SUMMARY DIAGNOSTIC - assert count and display raw contents
-	# =============================================================================
+	# -----------------------------------------------------------------------------
 
 	#Write-TLListItem "TL.Summary.Count = $TL.Summary.Count"
 
@@ -127,13 +128,19 @@ function Invoke-TLSummaryCheck {
 }
 
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 $headerSummary = @("full suite")
-if (-not [string]::IsNullOrEmpty($TestPhase)) { $headerSummary = @("phase: $TestPhase") }
-if ($TestInput)       { $headerSummary += "input tests" }
-if ($ConfirmVisuals)  { $headerSummary += "visual confirmation" }
+if (-not [string]::IsNullOrEmpty($TestPhase)) { 
+	$headerSummary = @("phase: $TestPhase") 
+}
+if ($TestInput)       { 
+	$headerSummary += "input tests" 
+}
+if ($ConfirmVisuals)  { 
+	$headerSummary += "visual confirmation" 
+}
 Write-TLHeader -Title "TidyLog Tests" -Summary $headerSummary
-# =============================================================================
+# -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
@@ -183,7 +190,6 @@ if (Test-ShouldRun "event") {
 if (Test-ShouldRun "config") {
 	Write-TLHeader -Title "Config Tests"
 	Write-TLPhase "CONFIG" "Set-TLLayout / Get-TLLayout / Set-TLPhaseColor / Set-TLGlyphSet"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Set-TLLayout - default values" {
 		Set-TLLayout
@@ -266,9 +272,10 @@ if (Test-ShouldRun "config") {
 
 	Invoke-TLSummaryCheck
 	Write-TLFooter
-# -----------------------------------------------------------------------------
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "Timer"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
@@ -297,6 +304,8 @@ if (Test-ShouldRun $section) {
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "Header"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
@@ -349,6 +358,8 @@ if (Test-ShouldRun $section) {
 
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "Phase"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
@@ -397,6 +408,8 @@ if (Test-ShouldRun $section) {
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "Detail"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
@@ -498,15 +511,20 @@ if (Test-ShouldRun $section) {
 
 
 	Write-TLHeader "All OK Check"
-	Write-TLPhase $section "Get-TLElapsed"
-
+	Write-TLPhase $section "Check Results table shows 'All Ok' when all summary entries are green"
+	
 	Test-TL "Write-TLDetail - OK Check" {
-		Write-TLDetail "Label" "Info" -Icon Ok -ShowInSummary
+		Write-TLDetail "Label" "Info 1" -Icon Ok -ShowInSummary
+		Write-TLDetail "Label" "Info 2" -Icon Ok -ShowInSummary		
 	}
+	$script:summaryExpected = 2		# expecting 2 entries in Summary
+	
 	Invoke-TLSummaryCheck
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "List"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
@@ -564,11 +582,12 @@ if (Test-ShouldRun $section) {
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "Progress"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase "PROGRESS" "Write-TLProgressDotBegin / Add / End"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Write-TLProgressDot - happy path" {
 		Write-TLProgressDotBegin "Processing items"
@@ -599,11 +618,12 @@ if (Test-ShouldRun $section) {
 	}
 }
 
+
+# -----------------------------------------------------------------------------
 $section = "Wait"
 if (Test-ShouldRun $section) {
 	Write-TLHeader -Title "$section Tests"
 	Write-TLPhase "WAIT" "Wait-TLTimed / Wait-TLConditional"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Wait-TLTimed - short wait (4 seconds, single colour)" {
 		Wait-TLTimed "Short wait" -Seconds 4
@@ -711,10 +731,11 @@ if (Test-ShouldRun $section) {
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 if (Test-ShouldRun "counter") {
 	Write-TLHeader "COUNTER"
 	Write-TLPhase "COUNTER" "Write-TLCounter"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Write-TLCounter - Count mode happy path" {
 		for ($i = 1; $i -le 5; $i++) {
@@ -815,10 +836,11 @@ if (Test-ShouldRun "counter") {
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 if (Test-ShouldRun "percent") {
 	Write-TLHeader "PERCENT"
 	Write-TLPhase "PERCENT" "Write-TLPercent"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Write-TLPercent - happy path" {
 		for ($p = 0; $p -le 100; $p += 20) {
@@ -958,10 +980,11 @@ if (Test-ShouldRun "percent") {
 	Write-TLFooter
 }
 
+
+# -----------------------------------------------------------------------------
 if (Test-ShouldRun "error") {
 	Write-TLHeader "ERROR"
-	Write-TLPhase "ERROR" "Write-TLError / Write-TLException"
-	# -----------------------------------------------------------------------------
+	Write-TLPhase "ERROR" "Write-TLError"
 
 	Test-TL "Write-TLError - message only" {
 		Write-TLError "Service failed to start"
@@ -988,10 +1011,10 @@ if (Test-ShouldRun "error") {
 }
 
 
+# -----------------------------------------------------------------------------
 if (Test-ShouldRun "exception") {
 	Write-TLHeader "Exception"
 	Write-TLPhase "Exception" "Write-TLException"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Write-TLException - standard mode" {
 		try { Get-Item "C:\does-not-exist\file.key" -ErrorAction Stop } catch {
@@ -1061,10 +1084,10 @@ if (Test-ShouldRun "exception") {
 } #end ERRORS
 
 
+# -----------------------------------------------------------------------------
 if (Test-ShouldRun "input") {
 	Write-TLHeader "INPUT"
 	Write-TLPhase "SELECTION VALIDATION" "Read-TLSelection - non-interactive validation"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "Read-TLSelection - more than 9 array options throws" {
 		$tooMany = 1..10 | ForEach-Object { "Option $_" }
@@ -1086,10 +1109,10 @@ if (Test-ShouldRun "input") {
 	}
 }
 
+
+# -----------------------------------------------------------------------------
 if ((Test-ShouldRun "input") -or $TestInput) {
-	# -----------------------------------------------------------------------------
 	Write-TLPhase "INPUT" "Read-TLInput"
-	# -----------------------------------------------------------------------------
 
     Write-TLDetail "Interactive tests enabled" "-TestInput flag passed" -Icon ok
 
@@ -1172,9 +1195,9 @@ if ((Test-ShouldRun "input") -or $TestInput) {
 }
 
 
+# -----------------------------------------------------------------------------
 if (Test-ShouldRun "glyphs") {
 	Write-TLPhase "GLYPHS" "Set-TLGlyphSet - ASCII vs Unicode"
-	# -----------------------------------------------------------------------------
 
 	Test-TL "ASCII glyph set - all icons" {
 		Set-TLGlyphSet -CharSet ASCII
@@ -1203,11 +1226,11 @@ if (Test-ShouldRun "glyphs") {
 }
 
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 # RESULTS
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-## put a final test header and footer here showing how many sections passed and failed
+# put a final test header and footer here showing how many sections passed and failed
 # eg total error count and in which phase
 # log each phase as its entered, then increment a counter per error. error sections may skip this.
 
@@ -1226,9 +1249,9 @@ if ("" -eq $TestPhase) {
 		Confirm-TLVisual "Footer shows centred pipe - message | elapsed - banner above"
 	}
 
-	# =============================================================================
+	# -----------------------------------------------------------------------------
 	# PSSA
-	# =============================================================================
+	# -----------------------------------------------------------------------------
 
 
 	Write-TLPhase "PSSA" "Invoke-ScriptAnalyzer on TidyLog.ps1"

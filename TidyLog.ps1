@@ -198,7 +198,9 @@ function Get-TLElapsed {
 	[OutputType([string])]
 	param()
 
-	if ($null -eq $TL.StartTime) { return "00m 00s" }
+	if ($null -eq $TL.StartTime) {
+		return "00m 00s"
+	}
 
 	$ts    = New-TimeSpan -Start $TL.StartTime
 	$hours = [int]$ts.TotalHours
@@ -250,7 +252,9 @@ function Write-TLHeader {
 	}
 
 	# only start timer if not already running, preserves elapsed time across multiple headers
-	if ($null -eq $TL.StartTime) { $TL.StartTime = Get-Date }
+	if ($null -eq $TL.StartTime) {
+		$TL.StartTime = Get-Date
+	}
 
 	$TL.DefaultColumn = 2	# deliberate reset
 
@@ -342,7 +346,13 @@ function Write-TLFooter {
 		$title  = "Results"
 		$gap	= [Math]::Max(1, $tableWidth - $title.Length - $countSummary.Length)
 		$errors = @(Get-TLEventSummary -EventType Error,Exception).Count
-		$countSummaryColor = if ($errors -gt 0) { (Get-TLIconInfo "Error").Color } elseif (@(Get-TLEventSummary -EventType Warning).Count -gt 0) { (Get-TLIconInfo "Warn").Color } else { (Get-TLIconInfo "Ok").Color }
+		$countSummaryColor = if ($errors -gt 0) {
+			(Get-TLIconInfo "Error").Color
+		} elseif (@(Get-TLEventSummary -EventType Warning).Count -gt 0) {
+			(Get-TLIconInfo "Warn").Color
+		} else {
+			(Get-TLIconInfo "Ok").Color
+		}
 
 		Write-Host ""
 		Write-TLBanner $tableWidth
@@ -435,9 +445,17 @@ function Write-TLPhase {
 	)
 
 	$TL.DefaultColumn = 2	# reset at each phase call
-	if (-not $SkipLeadingNewline) { Write-Host "" }
+	if (-not $SkipLeadingNewline) {
+		Write-Host ""
+	}
+
+	# replace blank description
 	$glyph		 = $(Get-TLIconInfo Dot).Glyph
-	$description = if ([string]::IsNullOrEmpty($Description)) { $glyph * 2 } else { $Description }	# replace blank description
+	$description = if ([string]::IsNullOrEmpty($Description)) {
+		$glyph * 2
+	} else {
+		$Description
+	}
 
 	# wrap and pad the tag
 	$tag = Get-TLPaddedText -Text ("[" + $Tag.ToUpper() + "]") -Column 1
@@ -445,7 +463,11 @@ function Write-TLPhase {
 
 	if ($ShowElapsed -and $null -ne $TL.StartTime) {
 		# show the elapsed time on the right side
-		$windowWidth = if ($Host.UI.RawUI.WindowSize) { $Host.UI.RawUI.WindowSize.Width - 10 } else { 80 }
+		$windowWidth = if ($Host.UI.RawUI.WindowSize) {
+			$Host.UI.RawUI.WindowSize.Width - 10
+		} else {
+			80
+		}
 		$line	 	 = $tag + $description
 		$elapsedPad  = " " * [Math]::Max(1, $windowWidth - $line.Length)
 
@@ -496,8 +518,12 @@ function Write-TLDetail {
 		[switch]$EndSection
 	)
 
-	if ($ShowInSummary) { Add-TLSummaryLine -Label $Label -Detail $Detail -Icon $Icon }
-	if ($BeginSection) { Write-Host "" }
+	if ($ShowInSummary) {
+		Add-TLSummaryLine -Label $Label -Detail $Detail -Icon $Icon
+	}
+	if ($BeginSection) {
+		Write-Host ""
+	}
 
 	$iconInfo    = Get-TLIconInfo $Icon
 
@@ -510,7 +536,9 @@ function Write-TLDetail {
 		Write-Host (Get-TLPaddedText -Text $Detail -Icon $Icon) -ForegroundColor $iconInfo.Color
 	}
 
-	if ($EndSection) {Write-Host ""}
+	if ($EndSection) {
+		Write-Host ""
+	}
 }
 
 
@@ -586,7 +614,9 @@ function Write-TLListEnd {
 		[switch]$ShowInSummary
 	)
 
-	if ($ShowInSummary) { Add-TLSummaryLine -Label $TL.ListLabel -Detail $Message -Icon $Icon }
+	if ($ShowInSummary) {
+		Add-TLSummaryLine -Label $TL.ListLabel -Detail $Message -Icon $Icon
+	}
 
 	$iconInfo = Get-TLIconInfo $Icon
 	Write-Host "$Message $($iconInfo.Glyph)" -ForegroundColor $iconInfo.Color
@@ -702,7 +732,10 @@ function Wait-TLTimed {
 	$iconOK = Get-TLIconInfo "Ok"
 
 	Write-Host (" $CompletionMessage ").TrimEnd() $iconOK.Glyph -ForegroundColor $iconOK.Color
-	if ($ShowInSummary) { Add-TLSummaryLine -Label $Label -Detail $CompletionMessage -Icon $iconOK.Word	}
+
+	if ($ShowInSummary) {
+		Add-TLSummaryLine -Label $Label -Detail $CompletionMessage -Icon $iconOK.Word
+	}
 }
 
 
@@ -775,7 +808,10 @@ function Wait-TLConditional {
 	}
 
 	Write-Host (" $msg ").TrimEnd() $iconInfo.Glyph -ForegroundColor $iconInfo.Color
-	if ($ShowInSummary) { Add-TLSummaryLine -Label $Label -Detail $msg -Icon $iconInfo.Word	}
+
+	if ($ShowInSummary) {
+		Add-TLSummaryLine -Label $Label -Detail $msg -Icon $iconInfo.Word
+	}
 
 	return $conditionMet
 }
@@ -848,12 +884,21 @@ function Write-TLCounter {
 
 	if ($As.Contains("Percent")) {
 		$pct = ([double]$Current / [double]$Total) * 100
-		$pct = if ("PercentExact" -eq $As) { "{0:F2}" -f [Math]::Round($pct, 2) } else { [Math]::Ceiling($pct) }
+		$pct = if ("PercentExact" -eq $As) {
+			"{0:F2}" -f [Math]::Round($pct, 2)
+		} else {
+			[Math]::Ceiling($pct)
+		}
 
 		$outText = "$pct%  ", "done $($iconInfo.Glyph)  "
 	}
 
-	$outText = if ($Current -ge $Total) { $outText[1] } else { $outText[0] }
+	$outText = if ($Current -ge $Total) {
+		$outText[1]
+	} else {
+		$outText[0]
+	}
+
 	$paddedLabel = Get-TLPaddedText $Label $Column
 
 	# adjust output format depnding on console support
@@ -872,7 +917,9 @@ function Write-TLCounter {
 		$TL.CounterState.Done = $false
 	}
 
-	if ($PassThru) { return $TL.CounterState.Done }
+	if ($PassThru) {
+		return $TL.CounterState.Done
+	}
 }
 
 
@@ -908,7 +955,9 @@ function Write-TLPercent {
 
 	$pct = [Math]::Ceiling($Percent)
 	$result = Write-TLCounter -Label $Label -Current $pct -Total 100 -As PercentWhole -Column $Column -PassThru:$PassThru
-	if ($PassThru) { return $result }
+	if ($PassThru) {
+		return $result
+	}
 }
 
 
@@ -933,14 +982,22 @@ function Write-TLCounterEnd {
 		[switch]$ShowInSummary
 	)
 
-	if ($TL.CounterState.Done) { return }
+	if ($TL.CounterState.Done) {
+		return
+	}
 
 	if (-not [string]::IsNullOrEmpty($Message)) {
 		$iconInfo = Get-TLIconInfo $Icon
-		$fallbackIndent = if ($TL.SupportsRewrite) {" "} else {Get-TLIndentSpacing}
+		$fallbackIndent = if ($TL.SupportsRewrite) {
+			" "
+		} else {
+			Get-TLIndentSpacing
+		}
 
 		Write-Host ($fallbackIndent + $Message) $iconInfo.Glyph -ForegroundColor $iconInfo.Color
-		if ($ShowInSummary) {Add-TLSummaryLine -Label $Message -Icon $Icon}
+		if ($ShowInSummary) {
+			Add-TLSummaryLine -Label $Message -Icon $Icon
+		}
 	} else {
 		Write-Host ""	# blank line to end the unfinished -NoNewline from Write-TLPercent
 	}
@@ -1011,7 +1068,12 @@ function Read-TLInput {
 		[int]$Column = $TL.DefaultColumn
 	)
 
-	$promptText	  = if (-not [string]::IsNullOrEmpty($Default)) { "$Prompt [$Default]" } else { $Prompt }
+	$promptText	  = if (-not [string]::IsNullOrEmpty($Default)) {
+		"$Prompt [$Default]"
+	} else {
+		$Prompt
+	}
+
 	$paddedPrompt = (Get-TLIndentSpacing $Column) + $promptText
 
 	if ($Mode -eq "Secure") {
@@ -1120,7 +1182,12 @@ function Read-TLSelection {
 
 	# validation, re-prompt on invalid input
 	while ($true) {
-		$promptText = if (-not [string]::IsNullOrEmpty($Default)) { "Press Enter to select" } else { "" }
+		$promptText = if (-not [string]::IsNullOrEmpty($Default)) {
+			"Press Enter to select"
+		} else {
+			""
+		}
+
 		$response   = Read-TLInput -Prompt $promptText -Column $Column -Default $Default
 		if ($response.ToLower() -in $validKeys) {
 			Write-Host ""	# create space below this block
@@ -1174,8 +1241,13 @@ function Write-TLError {
 	if ($hasDetail) {
 		Write-TLDetail -Label $Message -Icon Error -BeginSection
 
-		if (-not [string]::IsNullOrEmpty($Detail)) { Write-TLDetail "Detail" $Detail }
-		if (-not [string]::IsNullOrEmpty($Hint))   { Write-TLDetail "Hint"   $Hint   }
+		if (-not [string]::IsNullOrEmpty($Detail)) {
+			Write-TLDetail "Detail" $Detail
+		}
+
+		if (-not [string]::IsNullOrEmpty($Hint)) {
+			Write-TLDetail "Hint"   $Hint
+		}
 
 		$ts = Get-Date -Format "HH:mm:ss"
 		Write-TLDetail "Time" $ts -EndSection
@@ -1262,7 +1334,10 @@ function Write-TLException {
 		}
 	}
 
-	if (-not [string]::IsNullOrEmpty($Hint)) { Write-TLDetail "Hint" $Hint }
+	if (-not [string]::IsNullOrEmpty($Hint)) {
+		Write-TLDetail "Hint" $Hint
+	}
+
 	Write-TLDetail "Time" (Get-Date -Format "HH:mm:ss") -EndSection
 }
 
@@ -1390,12 +1465,19 @@ function Split-LongLine {
 	)
 
 	# wrap at console width if under 120, adjust buffer according to console width
-	$windowWidth = if ($Host.UI.RawUI.WindowSize) { $Host.UI.RawUI.WindowSize.Width - 10 } else { 80 }
-	$rightBuffer  = if ($windowWidth -gt 0 -and $windowWidth -lt 120 ) { 2 } else { 10 }
+	$windowWidth = if ($Host.UI.RawUI.WindowSize) {
+		$Host.UI.RawUI.WindowSize.Width - 10
+	} else {
+		80
+	}
+
+	$rightBuffer = if ($windowWidth -gt 0 -and $windowWidth -lt 120 ) { 2 } else { 10 }
 	$maxWidth = $windowWidth - ((Get-TLIndentSpacing $Column).Length + $rightBuffer)
 	$maxWidth = [Math]::Max($maxWidth, 20)	# preserve min line width
 
-	if ($Text.Length -le $maxWidth) { return @($Text) }
+	if ($Text.Length -le $maxWidth) {
+		return @($Text)
+	}
 
 	$lines   = @()
 	$words   = $Text -split ' '
@@ -1405,13 +1487,18 @@ function Split-LongLine {
 	foreach ($word in $words) {
 		$updatedLine = "$currentLine $word".TrimStart()
 		if ($updatedLine.Length -gt $maxWidth) {
-			if ($currentLine) { $lines += $currentLine.TrimEnd() }
+			if ($currentLine) {
+				$lines += $currentLine.TrimEnd()
+			}
 			$currentLine = $word		# reset current line
 		} else {
 			$currentLine = $updatedLine	# keep building
 		}
 	}
-	if ($currentLine) { $lines += $currentLine.TrimEnd() }
+
+	if ($currentLine) {
+		$lines += $currentLine.TrimEnd()
+	}
 
 	return $lines
 }
@@ -1432,7 +1519,9 @@ function Write-TLDetailMultiLine {
 	$regex = @'
 (?:(?<=[a-z0-9'"])\. (?=[A-Z])|(?<=")\. (?=[A-Z])|\r?\n)
 '@
-	if ("newline" -eq $Delimiter) { $regex = "`n" }
+	if ("newline" -eq $Delimiter) {
+		$regex = "`n"
+	}
 
 	# ScriptStackTrace uses \r\n line endings on Windows
 	# splitting on \n leaves trailing \r on each line
@@ -1462,7 +1551,12 @@ function Write-TLDetailMultiLine {
 		Write-TLDetail $separated[0] -Icon Error -BeginSection:$BeginSection
 	}
 
-	$column = if ([string]::IsNullOrEmpty($Label)) { $TL.DefaultColumn } else { 3 }
+	$column = if ([string]::IsNullOrEmpty($Label)) {
+		$TL.DefaultColumn
+	} else {
+		3
+	}
+
 	$separated | Select-Object -Skip 1 | ForEach-Object {
 		Write-TLDetail $_ -Column $column
 	}
@@ -1476,7 +1570,11 @@ function Get-TLIconInfo {
 		[string]$IconWord
 	)
 
-	$icon = if (-not [string]::IsNullOrEmpty($IconWord)) { $IconWord } else { "None" }
+	$icon = if (-not [string]::IsNullOrEmpty($IconWord)) {
+		$IconWord
+	} else {
+		"None"
+	}
 
 	$sets = @{
 		Unicode = @{
@@ -1501,7 +1599,12 @@ function Get-TLIconInfo {
 
 	$set   = $sets[$TL.CharSet]
 	$entry = $set[$icon]
-	return @{ Glyph = $entry.Glyph; Color = $entry.Color; Word = $icon }
+
+	return @{
+		Glyph = $entry.Glyph
+		Color = $entry.Color
+		Word  = $icon
+	}
 }
 
 # shared code for waiting functions
@@ -1546,7 +1649,9 @@ function Invoke-TLDotDisplay {
 	while ($elapsed -lt $Duration) {
 		if ($null -ne $Condition) {
 			$conditionMet = (& $Condition)
-			if ($conditionMet) { break }
+			if ($conditionMet) {
+				break
+			}
 		}
 
 		$dot = (Get-TLIconInfo Dot).Glyph
@@ -1557,7 +1662,9 @@ function Invoke-TLDotDisplay {
 		$elapsed += $WaitInterval
 	}
 
-	if ($PSBoundParameters.ContainsKey('Condition')) {return $conditionMet}
+	if ($PSBoundParameters.ContainsKey('Condition')) {
+		return $conditionMet
+	}
 }
 
 # gets truncated header title or summary
@@ -1569,11 +1676,17 @@ function Get-HeaderPart {
 		[int]$MaxLength = 47
 	)
 
-	if (0 -eq $Part.Length) { return $Part }
+	if (0 -eq $Part.Length) {
+		return $Part
+	}
 
 	# 100 max banner - 6 padding between title and summery = 94; 94/2 = 47 max chars per side
 	# if Part truncated, set 45 chars as allowable len to make space for the ..
-	$maxLen = if ($Part.Length -ge $PartCompare.Length) { $MaxLength - 2 } else { $MaxLength }
+	$maxLen = if ($Part.Length -ge $PartCompare.Length) {
+		$MaxLength - 2
+	} else {
+		$MaxLength
+	}
 
 	$addDots = $Part.EndsWith("..")
 	$Part = $Part.replace("..", "")		# remove to allow accurate comparison

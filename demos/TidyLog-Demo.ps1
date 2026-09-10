@@ -37,7 +37,11 @@ $tidyLogPath = if (Test-Path "$PSScriptRoot\TidyLog.ps1") {
 }
 . $tidyLogPath
 
-function ShouldRun { param([string]$Tag) return (-not $Phase -or $Phase -ieq $Tag) }
+function Test-ShouldRun {
+    param([string]$PhaseToRun)
+	
+    return ([string]::IsNullOrEmpty($Phase) -or $Phase.ToLower() -ieq $PhaseToRun.ToLower())
+}
 
 function Get-DeepException {
 	function Invoke-Level3 {
@@ -52,11 +56,12 @@ function Get-DeepException {
 	Invoke-Level1
 }
 
-# =============================================================================
-#  D1 - standalone mini-demo (Column 1 flat script pattern)
-# =============================================================================
 
-if (ShouldRun "D1") {
+# -----------------------------------------------------------------------------
+#  D1 - standalone mini-demo (Column 1 flat script pattern)
+# -----------------------------------------------------------------------------
+
+if (Test-ShouldRun "D1") {
 	Write-TLHeader -Title "TidyLog Demo #1" -Summary "v1.0","default layout","PS 5.1+" -SummaryColor Blue
 	Set-TLLayout -DefaultColumn 1 -Column1Width 18
 	Write-TLDetail "Set-TLLayout" "-DefaultColumn 1 -Column1Width 18"
@@ -78,21 +83,21 @@ if (ShouldRun "D1") {
 
 
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  HEADER - main demo
-# =============================================================================
-if (ShouldRun "HEADER") {
+# -----------------------------------------------------------------------------
+if (Test-ShouldRun "HEADER") {
 	Set-TLLayout -Column2Width 20 # reset layout to defaults
 	Write-TLHeader -Title "TidyLog Demo #2" -Summary "v1.0","default layout","PS 5.1+"
 	Write-TLDetail "Date"    (Get-Date -Format "ddd yyyy-MM-dd HH:mm") -Column 1
 	Write-TLDetail "Server"  "XV-88" -Column 1
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  ICONS
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "ICONS") {
+if (Test-ShouldRun "ICONS") {
 	Write-TLPhase "ICONS" "Write-TLPhase"
 	Write-TLDetail "Write-TLDetail" "no icon"
 	Write-TLDetail "Write-TLDetail" "ok" -Icon ok
@@ -101,11 +106,11 @@ if (ShouldRun "ICONS") {
 	Start-Sleep -Milliseconds 500
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  CONFIG
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "CONFIG") {
+if (Test-ShouldRun "CONFIG") {
 	Write-TLPhase "CONFIG" "Write-TLPhase with -Color Cyan" -Color Cyan
 		$layout = Get-TLLayout
 		Write-TLDetail "Margin"   "$($TL.Margin)"
@@ -116,11 +121,11 @@ if (ShouldRun "CONFIG") {
 	Start-Sleep -Milliseconds 500
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  DETAIL
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "DETAIL") {
+if (Test-ShouldRun "DETAIL") {
 	Write-TLPhase "Details" "Write-TLDetail with -ShowInSummary" -Color Cyan
 		Write-TLDetail "save ok"   "running" -Icon ok   -ShowInSummary
 		Write-TLDetail "save warn" "low"     -Icon warn -ShowInSummary
@@ -157,11 +162,11 @@ if (ShouldRun "DETAIL") {
 }
 
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  PROGRESS
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "PROGRESS") {
+if (Test-ShouldRun "PROGRESS") {
 
 	Write-TLPhase "PROGRESS" "Write-TLProgressDotBegin / Write-TLProgressDotAdd / Write-TLProgressDotEnd"
 		Write-TLDetail "Show dots while a task progresses"
@@ -172,24 +177,23 @@ if (ShouldRun "PROGRESS") {
 			Start-Sleep -Milliseconds 200
 		}
 		Write-TLProgressDotEnd -Icon Ok
-
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  TIMER
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "TIMER") {
+if (Test-ShouldRun "TIMER") {
 	Write-TLPhase "TIMER" "Add -ShowElapsed to Write-TLPhase. Elapsed time shown to the right >" -ShowElapsed
 		Write-TLDetail "Get script elapsed time using Get-TLElapsed" (Get-TLElapsed)
 	Start-Sleep -Milliseconds 500
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  WAIT
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "WAIT") {
+if (Test-ShouldRun "WAIT") {
 	if (-not $NoWait) {
 
 		Write-TLPhase "WAIT" "Blocking functions that display ""·"" during the wait."
@@ -218,11 +222,11 @@ if (ShouldRun "WAIT") {
 	}
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  COUNTERS
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "COUNTERS") {
+if (Test-ShouldRun "COUNTERS") {
 	if (-not $NoCounters) {
 		Set-TLLayout -Column3Width 28
 		Write-TLPhase "COUNTERS" "Write-TLCounter - in-place n of N"
@@ -263,11 +267,11 @@ if (ShouldRun "COUNTERS") {
 	}
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  PERCENT
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "PERCENT") {
+if (Test-ShouldRun "PERCENT") {
 	if (-not $NoCounters) {
 		Write-TLPhase "PERCENT" "Write-TLPercent - in-place percent" -SkipLeadingNewline
 
@@ -318,11 +322,11 @@ if (ShouldRun "PERCENT") {
 	}
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  ERROR
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "ERROR") {
+if (Test-ShouldRun "ERROR") {
 	Write-TLPhase "ERROR" "Write-TLError"
 		Write-TLError -Message "Write-TLError with -Detail and -Hint" `
 			-Detail "-Detail" `
@@ -333,11 +337,11 @@ if (ShouldRun "ERROR") {
 	Start-Sleep -Milliseconds 500
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  EXCEPTION
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "EXCEPTION") {
+if (Test-ShouldRun "EXCEPTION") {
 	Write-TLPhase "EXCEPTION" "Write-TLException - compact, standard, full" -ShowElapsed
 
 		Write-TLDetail "Compact" 'Write-TLException $_ -Mode Compact -Hint "User-facing. No stack details"' -Column 1 -BeginSection
@@ -360,21 +364,21 @@ if (ShouldRun "EXCEPTION") {
 	Start-Sleep -Milliseconds 500
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  PHASE COLOR
-# =============================================================================
-if (ShouldRun "PHASECOLOR") {
+# -----------------------------------------------------------------------------
+if (Test-ShouldRun "PHASECOLOR") {
 	Set-TLPhaseColor -Default DarkGreen
 	Write-TLPhase "PHASE COLOR" "Set-TLPhaseColor -Default DarkGreen" -SkipLeadingNewline
 		Write-TLDetail "Changing phase default color to DarkGreen"
 		Write-TLDetail "Change back to the default phase heading color by calling just 'Set-TLPhaseColor'"
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  INPUT
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "INPUT") {
+if (Test-ShouldRun "INPUT") {
 	if (-not $NoInput) {
 		Write-TLPhase "INPUT" "Read-TLInput - interactive prompts"
 			Write-TLDetail "Read-TLInput with -Default"
@@ -411,11 +415,11 @@ if (ShouldRun "INPUT") {
 	}
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  LAYOUT
-# =============================================================================
+# -----------------------------------------------------------------------------
 
-if (ShouldRun "LAYOUT") {
+if (Test-ShouldRun "LAYOUT") {
 	Write-TLPhase "LAYOUT" "Custom layout using Set-TLLayout"
 		Write-TLDetail "Set-TLLayout -Margin 4 -Column1Width 18 -Column2Width 18 -Column3Width 18"
 		Set-TLLayout -Margin 4 -Column1Width 18 -Column2Width 18 -Column3Width 18
@@ -433,8 +437,8 @@ if (ShouldRun "LAYOUT") {
 	Start-Sleep -Milliseconds 500
 }
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 #  SUMMARY + FOOTER - full run only
-# =============================================================================
+# -----------------------------------------------------------------------------
 Write-TLFooter -Message "Demo complete"
 

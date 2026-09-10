@@ -1,6 +1,8 @@
-﻿# TidyLog-Without.ps1
+﻿# =============================================================================
+# TidyLog-Without.ps1 - use for output comparison beside TidyLog-With.ps1
 # installer script - prod
 # don't run this on test!!
+# =============================================================================
 
 param(
     [int]$WaitTime = 650,

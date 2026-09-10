@@ -1,7 +1,7 @@
 ﻿# =============================================================================
 #  TidyLog-With.ps1
 #  The same installer script output as TidyLog-Without.ps1, but using TidyLog functions.
-#  Included in the TidyLog README to show the before/after contrast.
+#  Included in the TidyLog README to show the with/without contrast.
 # =============================================================================
 param(
     [int]$WaitTime = 650,
@@ -33,12 +33,12 @@ Write-TLDetail "Free space"   "264.76 GB" -Column 1
 # --- pre-flight checks ---
 Write-TLPhase "CHECKS" "Pre-flight checks"
     Write-TLDetail "Existing install found - upgrading"
-    Write-TLDetail "Service"  "running"   
-    Write-TLDetail "License file" "found"      -Icon Ok    
+    Write-TLDetail "Service"  "running"
+    Write-TLDetail "License file" "found"      -Icon Ok
     Write-TLDetail "Cert check"   "failed"     -Icon Error -ShowInSummary
 	Write-TLDetail "MSVC++"       "installed"  -Icon Ok
-    Write-TLDetail "Java" "not detected"    -Icon Warn 
-	
+    Write-TLDetail "Java" "not detected"    -Icon Warn
+
 	Write-TLDetail "Press the key in [brackets] to select how to continue." -BeginSection
     Write-TLDetail "[o] Install Oracle  ·  [a] Install Amazon Corretto  ·  [x] exit "
 	Write-Host (" " * 14)" : a"		# simulate Read-TLInput indent
@@ -47,13 +47,13 @@ Write-TLPhase "CHECKS" "Pre-flight checks"
 	Start-Sleep -MilliSeconds $WaitTime
 	Write-TLListItem "installing"
 	Start-Sleep -MilliSeconds $WaitTime
-	Write-TLListEnd "Java 21 installed" -Icon Ok	
+	Write-TLListEnd "Java 21 installed" -Icon Ok
 
 Start-Sleep -MilliSeconds $WaitTime
 
 Write-TLPhase "WOL" "Wake NAS"
 
-    Write-TLDetail "Target"  $NASHost    
+    Write-TLDetail "Target"  $NASHost
 
     # Send-WOL $NASMac
     $nasOnline = Wait-TLConditional -Label "Waiting for NAS" `
@@ -75,7 +75,7 @@ Write-TLPhase "file copy" "Copying installer files from NAS"
 	for ($i = 1; $i -le $total; $i++) {
 		Write-TLCounter "File copy" $i $total
 		Start-Sleep -Milliseconds 550
-	}    	
+	}
 
 Start-Sleep -Seconds 1
 
@@ -83,15 +83,15 @@ Start-Sleep -Seconds 1
 Write-TLPhase "server" "Installing server" -Color Cyan
     Write-TLListBegin "Extracting"
     Write-TLListItem  "server-v1.2.zip"
-    Write-TLListEnd   
-	
-    Write-TLDetail "Cache path"       "C:\Default"    
-    Write-TLDetail "Cache size"       "500 GB"        
-	
-    Write-TLListBegin "Running installer"    
+    Write-TLListEnd
+
+    Write-TLDetail "Cache path"       "C:\Default"
+    Write-TLDetail "Cache size"       "500 GB"
+
+    Write-TLListBegin "Running installer"
     Write-TLListItem  "delayed-auto set"
     Write-TLListItem  "service acc set"
-    Write-TLListEnd   "Installed "-Tick
+    Write-TLListEnd   "Installed " -Icon OK
 
 Start-Sleep -Seconds 1
 
