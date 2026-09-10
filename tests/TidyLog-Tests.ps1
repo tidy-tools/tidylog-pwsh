@@ -6,9 +6,9 @@
 # =============================================================================
 
 param(
-    [string]$TestPhase    = "",    # run only a specific phase e.g. -TestPhase "counters"
-    [switch]$TestInput,            # include interactive Read-TLInput tests
-    [switch]$ConfirmVisuals        # pause after visual tests for manual confirmation
+	[string]$TestPhase    = "",    # run only a specific phase e.g. -TestPhase "counters"
+	[switch]$TestInput,            # include interactive Read-TLInput tests
+	[switch]$ConfirmVisuals        # pause after visual tests for manual confirmation
 )
 
 . ..\TidyLog.ps1
@@ -19,43 +19,43 @@ $testsFailed     = 0
 $summaryExpected = 0   # incremented each time -ShowInSummary is used
 
 function Test-ShouldRun {
-    param(
+	param(
 		[string]$PhaseToRun
 	)
 
 	$script:summaryExpected = 0
-    return ([string]::IsNullOrEmpty($TestPhase) -or $TestPhase.ToLower() -ieq $PhaseToRun.ToLower())
+	return ([string]::IsNullOrEmpty($TestPhase) -or $TestPhase.ToLower() -ieq $PhaseToRun.ToLower())
 }
 
 function Confirm-TLVisual {
-    param(
+	param(
 		[string]$Check
 	)
 
-    if (-not $ConfirmVisuals) { return }
+	if (-not $ConfirmVisuals) { return }
 
 	Write-Host ""
-    $response = Read-TLInput -Prompt "Visual Check >> $Check - Enter = pass · x = fail"
+	$response = Read-TLInput -Prompt "Visual Check >> $Check - Enter = pass · x = fail"
 
-    if ($response -ieq "x") {
-        throw "Visual Check failed ## $Check"
-    }
+	if ($response -ieq "x") {
+		throw "Visual Check failed ## $Check"
+	}
 }
 
 function Test-TL {
-    param(
-        [string]$Name,
-        [scriptblock]$Test
-    )
+	param(
+		[string]$Name,
+		[scriptblock]$Test
+	)
 
 	$script:testCount++
 	$testNum = "TEST $("{0:D2}" -f [int]$script:testCount)"
 	Write-TLDetail "TEST $("{0:D2}" -f $script:testCount) : $Name" -Column 1
 
-    try {
-        & $Test
-        Write-TLDetail "$testNum : PASS : $Name" -Icon ok -Column 1
-        $script:testsPassed++
+	try {
+		& $Test
+		Write-TLDetail "$testNum : PASS : $Name" -Icon ok -Column 1
+		$script:testsPassed++
 
 		if ($Test.ToString() -match "Write-TLError" -or `
 			$Test.ToString() -match "Write-TLException" -or `
@@ -63,51 +63,51 @@ function Test-TL {
 			$script:summaryExpected++	## increase count because the test calls Write-TLError/TLException directly
 		}
 
-    } catch {
+	} catch {
 		$parts = $_ -split " ## "
 		Write-TLError -Message "$testNum : $($parts[0])"  $parts[1]
-        Write-TLDetail "$testNum : FAIL : $Name" -Icon Error  -Column 1
-        $script:testsFailed++
+		Write-TLDetail "$testNum : FAIL : $Name" -Icon Error  -Column 1
+		$script:testsFailed++
 		$script:summaryExpected++
-    }
+	}
 	Write-Host ""
 }
 
 function Assert-Equal {
-    param(
+	param(
 		$Expected,
 		$Actual,
 		[string]$Message = ""
 	)
 
-    if ($Expected -ne $Actual) {
-        throw "Expected '$Expected' but got '$Actual'. $Message"
-    }
+	if ($Expected -ne $Actual) {
+		throw "Expected '$Expected' but got '$Actual'. $Message"
+	}
 }
 
 function Assert-True {
-    param(
+	param(
 		$Value,
 		[string]$Message = ""
 	)
 
-    if (-not $Value) { throw "Expected true. $Message" }
+	if (-not $Value) { throw "Expected true. $Message" }
 }
 
 function Assert-Throws {
-    param(
+	param(
 		[scriptblock]$ScriptBlock,
 		[string]$Message = ""
 	)
 
-    $threw = $false
-    try {
+	$threw = $false
+	try {
 		& $ScriptBlock
 	} catch {
 		$threw = $true
 	}
 
-    if (-not $threw) {
+	if (-not $threw) {
 		throw "Expected exception but none was thrown. $Message"
 	}
 }
@@ -158,10 +158,10 @@ $headerSummary = @("full suite")
 if (-not [string]::IsNullOrEmpty($TestPhase)) {
 	$headerSummary = @("phase: $TestPhase")
 }
-if ($TestInput)       {
+if ($TestInput) {
 	$headerSummary += "input tests"
 }
-if ($ConfirmVisuals)  {
+if ($ConfirmVisuals) {
 	$headerSummary += "visual confirmation"
 }
 Write-TLHeader -Title "TidyLog Tests" -Summary $headerSummary
@@ -182,7 +182,7 @@ if (Test-ShouldRun "event") {
 	# add some events
 	Write-TLDetail "Status ok"   "confirmed"  -Icon ok -ShowInSummary
 	Write-TLDetail "Status warn" "low"        -Icon warn -ShowInSummary
-	Write-TLDetail "Status error" "not found"  -Icon Error -ShowInSummary
+	Write-TLDetail "Status error" "not found" -Icon Error -ShowInSummary
 	Write-TLError "Error message"
 
 	Test-TL "Get-TLEventSummary - event count" {
@@ -455,7 +455,7 @@ if (Test-ShouldRun $section) {
 	Test-TL "Write-TLDetail - all icons" {
 		Write-TLDetail "Status ok"   "confirmed"  -Icon ok
 		Write-TLDetail "Status warn" "low"        -Icon warn
-		Write-TLDetail "Status error" "not found"  -Icon Error -ShowInSummary
+		Write-TLDetail "Status error" "not found" -Icon Error -ShowInSummary
 		Confirm-TLVisual "ok=green tick, warn=amber warning, fail=red cross - all glyphs after value"
 	}
 
@@ -1139,41 +1139,41 @@ if (Test-ShouldRun "input") {
 if ((Test-ShouldRun "input") -or $TestInput) {
 	Write-TLPhase "INPUT" "Read-TLInput"
 
-    Write-TLDetail "Interactive tests enabled" "-TestInput flag passed" -Icon ok
+	Write-TLDetail "Interactive tests enabled" "-TestInput flag passed" -Icon ok
 
-    Test-TL "Read-TLInput - default accepted (press Enter)" {
-        $result = Read-TLInput -Prompt "Press Enter to accept default" -Default "accepted"
+	Test-TL "Read-TLInput - default accepted (press Enter)" {
+		$result = Read-TLInput -Prompt "Press Enter to accept default" -Default "accepted"
 		Write-TLDetail "You entered" $result
-        Assert-Equal "accepted" $result "Should return default when Enter pressed"
-    }
+		Assert-Equal "accepted" $result "Should return default when Enter pressed"
+	}
 
-    Test-TL "Read-TLInput - plain input no default" {
-        $result = Read-TLInput -Prompt "Enter any text"
-        Write-TLDetail "You entered" $result
+	Test-TL "Read-TLInput - plain input no default" {
+		$result = Read-TLInput -Prompt "Enter any text"
+		Write-TLDetail "You entered" $result
 		Assert-True (-not [string]::IsNullOrEmpty($result)) "Should return a value"
-    }
+	}
 
-    Test-TL "Read-TLInput - Secure mode returns SecureString" {
-        $result = Read-TLInput -Prompt "Enter a password" -Mode Secure
+	Test-TL "Read-TLInput - Secure mode returns SecureString" {
+		$result = Read-TLInput -Prompt "Enter a password" -Mode Secure
 		Assert-True ($result -is [System.Security.SecureString]) "Should return SecureString"
 
 		$decrypted = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($result)
 		$result = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($decrypted)
 		Write-TLDetail "You entered" $result
 
-    }
+	}
 
-    Test-TL "Read-TLInput - Mask mode returns plain string" {
-        $result = Read-TLInput -Prompt "Enter a token (masked)" -Mode Mask
+	Test-TL "Read-TLInput - Mask mode returns plain string" {
+		$result = Read-TLInput -Prompt "Enter a token (masked)" -Mode Mask
 		Write-TLDetail "You entered" $result
-        Assert-True ($result -is [string]) "Should return plain string"
-        Assert-True (-not [string]::IsNullOrEmpty($result)) "Should not be empty"
-    }
+		Assert-True ($result -is [string]) "Should return plain string"
+		Assert-True (-not [string]::IsNullOrEmpty($result)) "Should not be empty"
+	}
 
-    Test-TL "Read-TLInput - Column 1 placement" {
-        $result = Read-TLInput -Prompt "Column 1 prompt" -Column 1
-        Write-TLDetail "You entered" $result
-    }
+	Test-TL "Read-TLInput - Column 1 placement" {
+		$result = Read-TLInput -Prompt "Column 1 prompt" -Column 1
+		Write-TLDetail "You entered" $result
+	}
 
 	Write-TLPhase "INPUT" "Read-TLSelection"
 
@@ -1213,10 +1213,10 @@ if ((Test-ShouldRun "input") -or $TestInput) {
 	Write-TLFooter
 
 } elseif ("" -eq $TestPhase) {
-    Write-TLDetail "Input tests skipped" "pass -TestInput to enable" -Icon warn
-    Write-TLDetail "To test manually" "Read-TLInput -Prompt '...' -Default '...'"
-    Write-TLDetail "               " "Read-TLInput -Prompt '...' -Mode Secure"
-    Write-TLDetail "               " "Read-TLInput -Prompt '...' -Mode Mask"
+	Write-TLDetail "Input tests skipped" "pass -TestInput to enable" -Icon warn
+	Write-TLDetail "To test manually" "Read-TLInput -Prompt '...' -Default '...'"
+	Write-TLDetail "               " "Read-TLInput -Prompt '...' -Mode Secure"
+	Write-TLDetail "               " "Read-TLInput -Prompt '...' -Mode Mask"
 }
 
 
