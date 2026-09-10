@@ -19,14 +19,19 @@ $testsFailed     = 0
 $summaryExpected = 0   # incremented each time -ShowInSummary is used
 
 function Test-ShouldRun {
-    param([string]$PhaseToRun)
-	
+    param(
+		[string]$PhaseToRun
+	)
+
 	$script:summaryExpected = 0
     return ([string]::IsNullOrEmpty($TestPhase) -or $TestPhase.ToLower() -ieq $PhaseToRun.ToLower())
 }
 
 function Confirm-TLVisual {
-    param([string]$Check)
+    param(
+		[string]$Check
+	)
+
     if (-not $ConfirmVisuals) { return }
 
 	Write-Host ""
@@ -42,12 +47,12 @@ function Test-TL {
         [string]$Name,
         [scriptblock]$Test
     )
+
 	$script:testCount++
 	$testNum = "TEST $("{0:D2}" -f [int]$script:testCount)"
 	Write-TLDetail "TEST $("{0:D2}" -f $script:testCount) : $Name" -Column 1
 
     try {
-
         & $Test
         Write-TLDetail "$testNum : PASS : $Name" -Icon ok -Column 1
         $script:testsPassed++
@@ -69,22 +74,42 @@ function Test-TL {
 }
 
 function Assert-Equal {
-    param($Expected, $Actual, [string]$Message = "")
+    param(
+		$Expected,
+		$Actual,
+		[string]$Message = ""
+	)
+
     if ($Expected -ne $Actual) {
         throw "Expected '$Expected' but got '$Actual'. $Message"
     }
 }
 
 function Assert-True {
-    param($Value, [string]$Message = "")
+    param(
+		$Value,
+		[string]$Message = ""
+	)
+
     if (-not $Value) { throw "Expected true. $Message" }
 }
 
 function Assert-Throws {
-    param([scriptblock]$ScriptBlock, [string]$Message = "")
+    param(
+		[scriptblock]$ScriptBlock,
+		[string]$Message = ""
+	)
+
     $threw = $false
-    try { & $ScriptBlock } catch { $threw = $true }
-    if (-not $threw) { throw "Expected exception but none was thrown. $Message" }
+    try {
+		& $ScriptBlock
+	} catch {
+		$threw = $true
+	}
+
+    if (-not $threw) {
+		throw "Expected exception but none was thrown. $Message"
+	}
 }
 
 function Write-EventSummary {
@@ -130,14 +155,14 @@ function Invoke-TLSummaryCheck {
 
 # -----------------------------------------------------------------------------
 $headerSummary = @("full suite")
-if (-not [string]::IsNullOrEmpty($TestPhase)) { 
-	$headerSummary = @("phase: $TestPhase") 
+if (-not [string]::IsNullOrEmpty($TestPhase)) {
+	$headerSummary = @("phase: $TestPhase")
 }
-if ($TestInput)       { 
-	$headerSummary += "input tests" 
+if ($TestInput)       {
+	$headerSummary += "input tests"
 }
-if ($ConfirmVisuals)  { 
-	$headerSummary += "visual confirmation" 
+if ($ConfirmVisuals)  {
+	$headerSummary += "visual confirmation"
 }
 Write-TLHeader -Title "TidyLog Tests" -Summary $headerSummary
 # -----------------------------------------------------------------------------
@@ -512,13 +537,13 @@ if (Test-ShouldRun $section) {
 
 	Write-TLHeader "All OK Check"
 	Write-TLPhase $section "Check Results table shows 'All Ok' when all summary entries are green"
-	
+
 	Test-TL "Write-TLDetail - OK Check" {
 		Write-TLDetail "Label" "Info 1" -Icon Ok -ShowInSummary
-		Write-TLDetail "Label" "Info 2" -Icon Ok -ShowInSummary		
+		Write-TLDetail "Label" "Info 2" -Icon Ok -ShowInSummary
 	}
 	$script:summaryExpected = 2		# expecting 2 entries in Summary
-	
+
 	Invoke-TLSummaryCheck
 	Write-TLFooter
 }
@@ -1257,7 +1282,7 @@ if ("" -eq $TestPhase) {
 	Write-TLPhase "PSSA" "Invoke-ScriptAnalyzer on TidyLog.ps1"
 
 	$parentDir = Split-Path $PSScriptRoot -Parent
-	$analysisResults = Invoke-ScriptAnalyzer -Path (Join-Path $parentDir "TidyLog.ps1") -Settings (Join-Path $parentDir "PSScriptAnalyzerSettings.psd1")	
+	$analysisResults = Invoke-ScriptAnalyzer -Path (Join-Path $parentDir "TidyLog.ps1") -Settings (Join-Path $parentDir "PSScriptAnalyzerSettings.psd1")
 
 	if ($analysisResults.Count -eq 0) {
 		Write-TLDetail "PSSA passed" "zero findings" -Icon ok -ShowInSummary
