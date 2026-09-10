@@ -66,6 +66,7 @@ Write-TLFooter -Message "Install complete"
 # a results summary auto-renders above the footer if -ShowInSummary entries exist
 ```
 3) Run your new .ps1 file in PowerShell.
+4) Open the [REFERENCE.md] (https://github.com/tidy-tools/tidylog-pwsh/blob/main/REFERENCE.md) to see how to use the function library.
 
 ## Demo Scripts
 
