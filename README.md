@@ -120,7 +120,7 @@ To run the demo, download [TidyLog Demo Pack](https://github.com/tidy-tools/tidy
 
 # Links
 
-https://github.com/tidy-tools/tidylog-pwsh
+https://github.com/tidy-tools/tidylog-pwsh  
 https://tidylog.dev
 
 # Name and usage
