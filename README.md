@@ -29,11 +29,7 @@ Advantages over DIY layout:
 
 The difference:
 
-**> _Without_ TidyLog**  : Write-Host with occasional spacing.
-
-![Plain Write-Host output of an install script, with no structure or hierarchy](./images/without-tidylog.png)
-
-**> _With_ TidyLog** : The same output transformed by using space, structure and consistency. It's easy to scan **quickly**.
+**> _With_ TidyLog** : Output is transformed by using space, structure and consistency. It's easy to scan **quickly**.
 
 ![Same install script using TidyLog. Structured phases, semantic colour, and a summary block](./images/with-tidylog.png)
 
