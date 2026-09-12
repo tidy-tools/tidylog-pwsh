@@ -51,11 +51,12 @@ To create an example file that uses dot-source TidyLog:
 # lead with a header
 Write-TLHeader -Title "MyScript" -Summary "v2.0","prod","full install"
 
-# write phases to display details of actions/events
-Write-TLPhase "SERVER" "Installing Server"
-    Write-TLDetail "Java"            "21.0.3"
+# write phases to catch input and display details of actions/events
+Write-TLPhase "SERVER" "Installing Server" -SkipLeadingNewline
+    $version = Read-TLSelection -Options @("21.0.12.9.1", "25.0.4.8.1")
+    Write-TLDetail "Java"            $version.Value
     Write-TLDetail "Disk space"      "low"      -Icon warn
-    Write-TLDetail "Server install"  "complete" -Icon ok  -ShowInSummary
+    Wait-TLTimed "Server install" 2 "complete" -ShowInSummary
 
 # close with a footer
 Write-TLFooter -Message "Install complete"
